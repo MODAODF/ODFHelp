@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="ConstEnum" script:language="StarBasic">REM  *****  兩個以上模組不能同時 const 同一變數, 這邊以函式模擬 const  *****
+Option Explicit
+
+REM *****
+REM **PAWD_CALC_LISTBOX
+REM *****
+function PAWD_CALC_LISTBOX()
+	PAWD_CALC_LISTBOX() = &quot;gw98eg#@#Gg4&quot;
+end function
+
+REM *****
+REM **SimpleFileAccess
+REM *****
+function SimpleFileAccess()
+	SimpleFileAccess = &quot;com.sun.star.ucb.SimpleFileAccess&quot;
+end function
+
+REM *****
+REM **TextInputStream
+REM *****
+function TextInputStream()
+	TextInputStream = &quot;com.sun.star.io.TextInputStream&quot;
+end function
+
+REM *****
+REM **TextOutputStream
+REM *****
+function TextOutputStream()
+	TextOutputStream = &quot;com.sun.star.io.TextOutputStream&quot;
+end function
+
+REM *****
+REM **XTopWindowListener
+REM *****
+function XTopWindowListener()
+	XTopWindowListener() = &quot;com.sun.star.awt.XTopWindowListener&quot;
+end function
+
+REM *****
+REM **XTopWindowListener
+REM *****
+function XWindowListener()
+	XWindowListener() = &quot;com.sun.star.awt.XWindowListener&quot;
+end function
+
+REM *****
+REM **XActionListener
+REM *****
+function XActionListener()
+	XActionListener() = &quot;com.sun.star.awt.XActionListener&quot;
+end function
+
+REM *****
+REM **XKeyListener
+REM *****
+function XKeyListener()
+	XKeyListener() = &quot;com.sun.star.awt.XKeyListener&quot;
+end function
+
+REM *****
+REM **XEnhancedMouseClickHandler
+REM *****
+function XEnhancedMouseClickHandler()
+	XEnhancedMouseClickHandler() = &quot;com.sun.star.awt.XEnhancedMouseClickHandler&quot;
+end function
+
+REM *****
+REM **XCloseable
+REM *****
+function XCloseable()
+	XCloseable() = &quot;com.sun.star.util.XColseable&quot;
+end function
+
+REM *****
+REM **XFrame
+REM *****
+function XFrame()
+	XFrame() = &quot;com.sun.star.frame.Frame&quot;
+end function
+
+REM *****
+REM **normal color
+REM *****
+function SEARCH_COLOR_NORMAL()
+	SEARCH_COLOR_NORMAL() = -1  &apos; no fill
+end function
+
+REM *****
+REM **searched color
+REM *****
+function SEARCH_COLOR_SEARCHED()
+	SEARCH_COLOR_SEARCHED() = RGB(255, 255, 0)
+end function
+
+REM *****
+REM **current color
+REM *****
+function SEARCH_COLOR_CURRENT()
+	SEARCH_COLOR_CURRENT() = RGB(122, 122, 122)
+end function
+
+</script:module>

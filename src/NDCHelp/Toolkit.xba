@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Toolkit" script:language="StarBasic">REM  *****  toolkits for window/dialog/frame/button creation  *****
+
+Function CreateTopWindow( x, y, w, h)
+   oAwtToolkit = CreateUnoService(&quot;com.sun.star.awt.Toolkit&quot;)
+   oWindowDesc = CreateUnoStruct( &quot;com.sun.star.awt.WindowDescriptor&quot; )
+   With oWindowDesc
+      .Type = com.sun.star.awt.WindowClass.TOP
+&apos;      .Type = com.sun.star.awt.WindowClass.MODALTOP
+&apos;      .Type = com.sun.star.awt.WindowClass.CONTAINER
+&apos;      .Type = com.sun.star.awt.WindowClass.SIMPLE
+      .WindowServiceName = &quot;&quot;
+      .ParentIndex = -1
+&apos;      .Parent = p
+      .Bounds = MakeRectangle( x, y, w, h )
+      
+      .WindowAttributes = 0
+      .WindowAttributes = .WindowAttributes + com.sun.star.awt.WindowAttribute.SHOW
+&apos;      .WindowAttributes = .WindowAttributes + com.sun.star.awt.WindowAttribute.FULLSIZE
+&apos;      .WindowAttributes = .WindowAttributes + com.sun.star.awt.WindowAttribute.OPTIMUMSIZE
+&apos;      .WindowAttributes = .WindowAttributes + com.sun.star.awt.WindowAttribute.MINSIZE
+      .WindowAttributes = .WindowAttributes + com.sun.star.awt.WindowAttribute.BORDER
+      .WindowAttributes = .WindowAttributes + com.sun.star.awt.WindowAttribute.SIZEABLE
+      .WindowAttributes = .WindowAttributes + com.sun.star.awt.WindowAttribute.MOVEABLE
+      .WindowAttributes = .WindowAttributes + com.sun.star.awt.WindowAttribute.CLOSEABLE
+   End With
+   
+   oXWindowPeer = oAwtToolkit.createWindow( oWindowDesc )
+   CreateTopWindow = oXWindowPeer
+End Function
+
+Function CreateSubWindow( parentWindow, x, y, w, h )
+   oAwtToolkit = CreateUnoService(&quot;com.sun.star.awt.Toolkit&quot;)
+   oWindowDesc = CreateUnoStruct( &quot;com.sun.star.awt.WindowDescriptor&quot; )
+   With oWindowDesc
+      .Type = com.sun.star.awt.WindowClass.CONTAINER
+      
+      .WindowServiceName = &quot;&quot;
+      .Parent = parentWindow      
+      .Bounds = MakeRectangle( x, y, w, h )
+
+      .WindowAttributes = 0
+      .WindowAttributes = .WindowAttributes + com.sun.star.awt.WindowAttribute.SHOW
+&apos;      .WindowAttributes = .WindowAttributes + com.sun.star.awt.WindowAttribute.FULLSIZE
+      .WindowAttributes = .WindowAttributes + com.sun.star.awt.WindowAttribute.OPTIMUMSIZE
+&apos;      .WindowAttributes = .WindowAttributes + com.sun.star.awt.WindowAttribute.MINSIZE
+      .WindowAttributes = .WindowAttributes + com.sun.star.awt.WindowAttribute.BORDER
+      .WindowAttributes = .WindowAttributes + com.sun.star.awt.WindowAttribute.SIZEABLE
+&apos;      .WindowAttributes = .WindowAttributes + com.sun.star.awt.WindowAttribute.MOVEABLE
+      .WindowAttributes = .WindowAttributes + com.sun.star.awt.WindowAttribute.CLOSEABLE
+   End With
+   oXWindowPeer = oAwtToolkit.createWindow( oWindowDesc )   
+   CreateSubWindow = oXWindowPeer
+End Function
+
+Function MakeBtnCtl( oWindow, cLabel, command, calbak, Optional oPosSizeRect )
+   oAwtToolkit = CreateUnoService(&quot;com.sun.star.awt.Toolkit&quot;)
+   oButtonModel = CreateUnoService( &quot;com.sun.star.awt.UnoControlButtonModel&quot; )
+   oButtonCtrl = CreateUnoService( &quot;com.sun.star.awt.UnoControlButton&quot; )
+   oButtonCtrl.setModel( oButtonModel )
+   oButtonCtrl.createPeer( oAwtToolkit, oWindow )
+   
+   oButtonModel.Label = cLabel
+   oButtonCtrl.ActionCommand = command
+   oButtonCtrl.addActionListener(calbak)
+
+   If Not IsMissing( oPosSizeRect ) Then
+      oButtonCtrl.setPosSize( _
+                  oPosSizeRect.X, oPosSizeRect.Y,_
+                  oPosSizeRect.Width, oPosSizeRect.Height,_
+                  com.sun.star.awt.PosSize.POSSIZE )
+   EndIf
+   MakeBtnCtl = oButtonCtrl
+End Function
+
+Function MakeListBoxCtrl(window, mframe, calbak, cols)
+	dim frame, listbox, doc, idx
+
+    listbox = CreateSubWindow(Window, 0, 0, 0, 0)
+	frame = createUnoService(XFrame)
+	frame.initialize(listbox)
+	frame.setCreator(MFrame)
+	doc = Frame.loadComponentFromUrl(_
+			&quot;private:factory/scalc&quot;, &quot;_self&quot;, 0, array())
+	pyHideAllUI(doc, frame)
+	with doc.currentController
+		.HasHorizontalScrollBar = false
+		.addEnhancedMouseClickHandler(calbak)
+
+		.ActiveSheet.unprotect(PAWD_CALC_LISTBOX)
+		For idx = 0 To ubound(cols)
+			.ActiveSheet.getCellByPosition(idx, 0).string = cols(idx)
+		Next
+		.ActiveSheet.Rows.getByIndex(0).cellBackColor = SEARCH_COLOR_CURRENT
+		.ActiveSheet.protect(PAWD_CALC_LISTBOX)
+	end with
+	MakeListBoxCtrl = array(doc, listbox)
+End Function
+
+Function MakeRectangle( ByVal nX As Long, ByVal nY As Long,_
+                  ByVal nWidth As Long, ByVal nHeight As Long ) As com.sun.star.awt.Rectangle
+   oRectangle = createUnoStruct( &quot;com.sun.star.awt.Rectangle&quot; )
+   With oRectangle
+      .X = nX
+      .Y = nY
+      .Width = nWidth
+      .Height = nHeight
+   End With
+   MakeRectangle() = oRectangle
+End Function
+</script:module>

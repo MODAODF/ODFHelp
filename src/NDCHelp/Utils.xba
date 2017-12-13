@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Utils" script:language="StarBasic">REM  *****  tools  *****
+Option Explicit
+
+REM *****
+REM **prepare for load modules
+REM *****
+function loadModules()
+	If BasicLibraries.HasByName(&quot;XrayTool&quot;) Then
+    	BasicLibraries.LoadLibrary(&quot;XrayTool&quot;)
+	End If
+	If BasicLibraries.HasByName(&quot;Tools&quot;) Then
+    	BasicLibraries.LoadLibrary(&quot;Tools&quot;)
+	End If
+End function
+
+REM *****
+REM **init: 前置函式
+REM *****
+function init()
+	loadModules()
+	dialogLibraries.loadLibrary(&quot;NDCHelp&quot;)
+	helpContOpened = true
+end function
+
+&apos;----------
+&apos;	Create and return a new com.sun.star.beans.PropertyValue.
+&apos;
+Function MakePropertyValue( Optional cName As String, Optional uValue ) As com.sun.star.beans.PropertyValue
+	dim oPropertyValue
+
+	oPropertyValue = createUnoStruct(&quot;com.sun.star.beans.PropertyValue&quot;)
+	If Not IsMissing(cName) Then
+		oPropertyValue.Name = cName
+	EndIf
+	If Not IsMissing(uValue) Then
+		oPropertyValue.Value = uValue
+	EndIf
+	MakePropertyValue() = oPropertyValue
+End Function
+
+REM *****
+REM **Create and return a new com.sun.star.beans.NamedValue.
+REM *****
+Function MakeNamedValue( Optional cName As String, Optional uValue ) As com.sun.star.beans.NamedValue
+	dim oPropertyValue
+
+	oPropertyValue = createUnoStruct(&quot;com.sun.star.beans.NamedValue&quot;)
+	If Not IsMissing(cName) Then
+		oPropertyValue.Name = cName
+	EndIf
+	If Not IsMissing(uValue) Then
+		oPropertyValue.Value = uValue
+	EndIf
+	MakeNamedValue() = oPropertyValue
+End Function
+
+REM *****
+REM **取得模組路徑
+REM *****
+Function getModulePath()
+	Dim oKey As Object
+	Dim oImage As Object
+	Dim sURL As String
+	Dim oMS As Object
+	
+	loadModules()
+
+	&apos;retrieve the URL from the registry
+	oKey = getRegistryKeyContent(&quot;org.openoffice.Office.Addons/AddonUI/Images/&quot;)
+	oImage = oKey.getByName(&quot;org.openoffice.Office.addon.NDCHelper.dummy&quot;)
+	sURL = oImage.URL
+	sURL = Join(Split(sURL, &quot;vnd.sun.star.expand:&quot;))
+	oMS = getProcessServiceManager().DefaultContext.getValueByName(&quot;/singletons/com.sun.star.util.theMacroExpander&quot;)
+	sURL = oMS.ExpandMacros(sURL)
+
+	&apos; 只保留前面的路徑
+	getModulePath() = Trim(sURL)
+End Function
+
+REM *****
+REM **取得 .config 路徑
+REM *****
+function getUserConfigPathUrl()
+	Dim PathSettings AS Object
+
+	PathSettings = CreateUnoservice(&quot;com.sun.star.util.PathSettings&quot;)
+	getUserConfigPathUrl() = pathsettings.UserConfig
+end function
+
+REM *****
+REM **取得 userdata for QA login 路徑
+REM *****
+Function userDataFileUrl()
+	userDataFileUrl = getUserConfigPathUrl() &amp; &quot;/udata.txt&quot;
+End Function
+
+REM *****
+REM **取得 errorlog file 路徑
+REM *****
+Function errFileUrl()
+	errFileUrl = getModulePath() &amp; &quot;/err.log&quot;
+End Function
+
+REM *****
+REM **取得暫存檔名(該檔案還沒建立)
+REM *****
+function getTmpFileName()
+	dim ostream, uri
+
+	&apos; 開新暫存檔案，以該檔名為基礎傳回另一個檔名
+	ostream = createUnoService(&quot;com.sun.star.io.TempFile&quot;)
+	uri = ostream.uri + &quot;_&quot;
+
+	getTmpFileName() = uri
+end function
+
+REM *****
+REM **插入區段，設定該區段為唯讀受保護
+REM *****
+function insertProtectSection(frame, docuri)
+	dim dispatcher as object
+	dispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+
+	rem ----------------------------------------------------------------------
+	dim args1(6) as new com.sun.star.beans.PropertyValue
+	args1(0).Name = &quot;RegionName&quot;
+	args1(0).Value = &quot;Section1&quot;
+	args1(1).Name = &quot;RegionCondition&quot;
+	args1(1).Value = &quot;&quot;
+	args1(2).Name = &quot;RegionHidden&quot;
+	args1(2).Value = false
+	args1(3).Name = &quot;RegionProtect&quot;
+	args1(3).Value = true
+	args1(4).Name = &quot;LinkName&quot;
+	args1(4).Value = docuri
+	args1(5).Name = &quot;FilterName&quot;
+	args1(5).Value = &quot;writer8&quot;
+	args1(6).Name = &quot;SubRegion&quot;
+	args1(6).Value = &quot;&quot;
+
+	dispatcher.executeDispatch(frame, &quot;.uno:InsertSection&quot;, &quot;&quot;, 0, args1())
+end Function
+
+REM *****
+REM **save error to .txt
+REM *****
+Function saveError(msg)
+	Dim sfa, ostream, tstream
+	Dim ErLine, ErNum As Integer
+	Dim errlog, ErMsg As String
+	ErLine = Erl: ErNum = Err: ErMsg = Error
+	errlog = &quot;Error Line No. &quot; &amp; Chr$(9) &amp; &quot; : &quot; &amp; ErLine &amp; Chr$(10) _
+		&amp; &quot;Error Number &quot; &amp; Chr$(9) &amp; &quot; : &quot; &amp; ErNum &amp;Chr$(10) _
+		&amp; &quot;Error Message&quot; &amp; Chr$(9) &amp; &quot; : &quot; &amp; ErMsg
+
+	sfa = CreateUnoService(SimpleFileAccess)
+	ostream = sfa.openFileWrite(errFileUrl())
+	tstream = CreateUnoService(TextOutputStream)
+	tstream.setEncoding(&quot;UTF-8&quot;)
+	tstream.setOutputStream(ostream)
+	tstream.writeString(errlog)
+	ostream.closeOutput()
+
+	msgbox msg &amp; chr(10) &amp; chr(10) &amp; &quot;錯誤訊息已寫入：&quot; &amp; errFileUrl(), 0, &quot;發生錯誤&quot;
+End Function
+
+&apos; ------------------------------
+&apos; This macro displays the operating system on which the macro is run
+&apos;
+&apos; Written by Heertsch
+&apos; ( http://forum.openoffice.org/en/forum/viewtopic.php?f=45&amp;t=26280&amp;p=176535&amp;hilit=operating#p137780 )
+&apos; ------------------------------
+function getOS() AS String
+   select case getGUIType
+      case 1: getOS=pyGetWindowsVer()
+      case 3: getOS=&quot;MAC&quot;
+      case 4: getOS=iif(instr(environ(&quot;PATH&quot;),&quot;/usr/local/bin&quot;)=0,&quot;OSX&quot;,&quot;UNIX&quot;)
+      Case else: getOS=&quot;其他系統&quot;
+   end Select
+end Function
+
+REM *****
+REM **取得 &quot;oxoffice名稱 版號&quot;
+REM *****
+Function GetProductname() as String
+	Dim oProdNameAccess as Object
+	Dim sVersion as String
+	Dim sProdName as String
+
+	oProdNameAccess = GetRegistryKeyContent(&quot;org.openoffice.Setup/Product&quot;)
+	sProdName = oProdNameAccess.getByName(&quot;ooName&quot;)
+	sVersion = oProdNameAccess.getByName(&quot;ooSetupVersion&quot;)
+	GetProductName = sProdName &amp; &quot; &quot; &amp; sVersion
+End Function
+
+REM *****
+REM **取得自己模組的版號
+REM **若安裝重複模組，則　bundled &gt; shared &gt; user
+REM *****
+Function getMyNameVersion()
+	Dim idx, which, package, exts, ext, version
+	Const extname = &quot;NDCHelp&quot;
+	Const ExtMgr = &quot;/singletons/com.sun.star.deployment.ExtensionManager&quot;
+
+	version = &quot;?.?.?&quot;
+	package = GetDefaultContext.GetValueByName(ExtMgr)
+	exts = package.getAllExtensions(null, null)
+	For idx = 0 To ubound(exts)
+		For which = 0 To 2  &apos; 0: user  1: shared  2: bundled
+			ext = exts(idx)(which)
+			If Not IsNull(ext) Then
+				if left(ext.Name, len(extname)) = extname Then
+					version = ext.version
+				EndIf
+			EndIf
+		Next
+	Next
+	getMyNameVersion() = extname + &quot; &quot; + version
+End Function
+</script:module>

@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="UI_se" script:language="StarBasic">REM  *****  UI: 產生主視窗（QA查詢結果）  *****
+Option Explicit
+global window_se, subWindow_se as object
+global MFrame_se as object
+global initDoc_se, doc_se as object
+global doclbox_se  &apos; @TODO: (bug?) 此變數若放上面那行則會出錯
+global listBox_se, closebtn_se
+global resizeSbtn_se, resizeMbtn_se
+global findNextbtn_se, findPrevbtn_se
+Global queryBtn_se
+global mevt
+Global is_se_or_stlst As string
+Const FIELD_TOPICID = 255
+Const FIELD_BREADCRUMB = 256
+Const FIELD_SHOWCONTENT = 257
+
+REM *****
+REM **Alias to sheet.getCellByPosition()
+REM *****
+Function cellByPos(sheet, x, y)
+	cellByPos() = sheet.getCellByPosition(x, y)
+End Function
+
+REM *****
+REM **insert data to calc/listbox
+REM *****
+function insertdata_st(doc, list)
+	dim idx, sheet
+
+	sheet = doc.currentController.ActiveSheet
+	sheet.unprotect(PAWD_CALC_LISTBOX)
+
+	On Local Error GoTo err
+	for idx = 0 to ubound(list)
+		cellByPos(sheet, 0, idx + 1).string = list(idx)(1)  &apos; 審核狀態 str
+		cellByPos(sheet, 1, idx + 1).string = list(idx)(2)  &apos; 編號
+		cellByPos(sheet, 2, idx + 1).string = list(idx)(0)  &apos; title
+		cellByPos(sheet, 3, idx + 1).string = list(idx)(4)  &apos; 回應時間
+		cellByPos(sheet, FIELD_TOPICID, idx + 1).value = list(idx)(2) &apos; topic_id
+		cellByPos(sheet, FIELD_SHOWCONTENT, idx + 1).value = list(idx)(3) &apos; 審核狀態 0/1
+	next
+	sheet.protect(PAWD_CALC_LISTBOX)
+err:
+end function
+
+REM *****
+REM **insert data to calc/listbox
+REM *****
+function insertdata_se(doc, list)
+	dim idx, sheet, data, col
+	Dim title, cur_forum_name
+	dim topic_id As integer
+
+	sheet = doc.currentController.ActiveSheet
+	sheet.unprotect(PAWD_CALC_LISTBOX)
+
+	for idx = 0 to ubound(list)
+		data = list(idx)
+		title = data(0)
+
+		If data(1) = 0 Then  &apos; show forum name
+			col = 0
+			topic_id = 0  &apos; topic_id
+			cur_forum_name = title
+		Else  &apos; show topic title
+			col = 1
+			topic_id = cint(data(1))  &apos; topic_id
+		EndIf
+		cellByPos(sheet, col, idx + 1).string = title
+		cellByPos(sheet, 255, idx + 1).value = topic_id
+		cellByPos(sheet, 256, idx + 1).String = cur_forum_name + &quot; &gt;&gt; &quot; + title
+		cellByPos(sheet, 257, idx + 1).value = 1  &apos; click to show/no action
+	Next
+	sheet.protect(PAWD_CALC_LISTBOX)
+end Function
+
+REM *****
+REM **顯示說明界面
+REM *****
+function startUI_se(datas, se_or_stlst As String)
+	dim calbak, idx, frame, parms, fields
+
+	init()
+
+	is_se_or_stlst = se_or_stlst
+	doc_se = nothing  &apos; 給預設值避免第二次以後執行，關鍵字查詢會出錯的情況發生
+	doclbox_se = nothing
+	prerow = nothing
+	func_keyword = &quot;&quot;
+	presearch_keyword = &quot;&quot;
+	initDoc_se = pyCreateNewDoc(, true)	 &apos; hidden doc used for py*(doc, ...)
+
+	dim tw, th, tx, ty  &apos; t=top window
+	tx = 100: ty = 200: tw = 1024: th = 670
+
+	&apos; 外框
+    Window_se = CreateTopWindow(tx, ty, tw, th)
+    Window_se.setBackground(RGB(240, 240, 255))
+
+	&apos; index 列表
+	mevt = CreateUnoListener(&quot;lboxse_&quot;, XEnhancedMouseClickHandler)
+	If se_or_stlst = &quot;se&quot; Then
+		fields = array(&quot;版面&quot;, &quot;問題&quot;)
+	EndIf
+	If se_or_stlst = &quot;stlst&quot; Then
+		fields = array(&quot;狀態&quot;, &quot;編號&quot;, &quot;問題抬頭&quot;, &quot;回應時間&quot;)
+	EndIf
+		parms = MakeListBoxCtrl(window_se, mframe_se, mevt, fields)
+	doclbox_se = parms(0)
+	listbox_se = parms(1)
+	If se_or_stlst = &quot;se&quot; then insertdata_se(doclbox_se, datas)
+	If se_or_stlst = &quot;stlst&quot; Then insertdata_st(doclbox_se, datas)
+
+	calbak = CreateUnoListener(&quot;actse_&quot;, XActionListener)
+	&apos; 關鍵字查詢
+	If se_or_stlst = &quot;stlst&quot; Then
+	    queryBtn_se = MakeBtnCtl(Window_se, &quot;關鍵字查詢&quot;, &quot;query&quot;, calbak)
+	EndIf
+	&apos; 關閉
+    closebtn_se = MakeBtnCtl(Window_se, &quot;關閉&quot;, &quot;close&quot;, calbak)
+
+	&apos; main frame for content window
+	MFrame_se = createUnoService(&quot;com.sun.star.frame.Frame&quot;)
+	MFrame_se.initialize(Window_se)
+	&apos;MFrame.setCreator(stardesktop)
+
+	calbak = CreateUnoListener(&quot;twinse_&quot;, XWindowListener)
+	Window_se.addWindowListener(calbak)
+
+	calbak = CreateUnoListener(&quot;twinqh_&quot;, XKeyListener)
+	Window_se.addKeyListener(calbak)
+
+	initContentWindow(window_se, subwindow_se, MFrame_se)
+	twinse_windowResized(window_se.possize)  &apos; set size
+end function
+
+REM *****
+REM **listbox: click
+REM **選取索引顯示說明於　content window
+REM *****
+function lbox_selectItem_se(e)
+	dim frame, sheet, row, idx, topic_id, breadcrumb
+
+	if e.clickCount &lt;&gt; 1 then exit function
+
+&apos;	on error goto err
+	sheet = doclbox_se.currentController.ActiveSheet
+	idx = e.target.getCellAddress.Row
+
+	if not helpContOpened Then Exit Function  &apos; pass for content opened
+	if idx = 0 then exit function  &apos; pass for header
+	topic_id = sheet.getCellByPosition(255, idx).value
+	if topic_id = 0 then exit Function  &apos; 不處理沒字區域
+
+	row = sheet.rows.getByIndex(idx)
+
+	&apos; 關閉先前開啟的 content window
+	if not isNull(doc_se) then doc_se.close(false)
+	subwindow_se.dispose()
+
+	frame = initContentWindow(window_se, subwindow_se, MFrame_se)  &apos; create new
+	if sheet.getCellByPosition(257, idx).value = 1 Then  &apos; value = 0 : no action
+		breadcrumb = sheet.getCellByPosition(256, idx).String
+		If breadcrumb = &quot;&quot; Then
+			breadcrumb = sheet.getCellByPosition(1, idx).String
+		EndIf
+		loadDoc(Frame, doc_se, topic_id, &quot;se&quot;, breadcrumb)  &apos; 載入說明
+	EndIf
+
+	twinse_windowResized(window_se.possize)
+
+	&apos; 反白/還原區域
+	sheet.unprotect(PAWD_CALC_LISTBOX)
+	row.cellBackColor = SEARCH_COLOR_SEARCHED
+	if not isEmpty(prerow) and not isNull(prerow) then
+		if prerow.AbsoluteName &lt;&gt; row.AbsoluteName then
+			prerow.cellBackColor = SEARCH_COLOR_NORMAL
+		endif
+	endif
+	sheet.protect(PAWD_CALC_LISTBOX)
+
+	prerow = row
+err:
+End Function
+
+
+REM *****
+REM **Callbacks
+REM *****
+
+Sub lboxse_disposing(e)
+End Sub
+function lboxse_mousePressed(e)
+	lbox_selectItem_se(e)
+	lboxse_mousePressed = false
+End Function
+function lboxse_mouseReleased(e)
+	lboxse_mouseReleased = false
+End function
+Sub actse_disposing(e)
+End Sub
+REM *****
+REM **button click:
+REM **通用按鈕觸發事件
+REM *****
+Sub actse_actionPerformed(e)
+	select case e.actionCommand
+		case &quot;query&quot;:
+			doSearchQA()  &apos; QA查詢
+		case &quot;close&quot;:
+			actClose_qh(e)  &apos; 關閉視窗
+	end select
+end sub
+
+Sub twinse_disposing(e)
+	actClose_qh(e)
+End Sub
+Sub twinse_windowResized(e)
+	&apos; listbox
+	dim lw, lh, lx, ly  &apos; l=list box
+	lx = 20: ly = 10: lw = e.Width/2.5: lh = e.Height - 80
+	listbox_se.setPosSize(lx, ly, lw, lh, 15)
+
+	&apos; subwindow
+	dim possize, x, y, w, h
+	possize = listBox_se.posSize
+	x = possize.x + possize.Width + 20
+	y = 10
+	w = window_se.Size.Width - possize.Width - 60
+	h = possize.Height
+	if not isEmpty(subwindow_se) and not isNULL(subwindow_se) then
+		subwindow_se.setPosSize(x, y, w, h, 15)
+	endif
+
+	&apos; close button
+	w = e.Width / 10
+	h = 50
+	x = e.Width - 10 - w
+	y = ly + lh + 5
+	if not isEmpty(closebtn_se) and not isNULL(closebtn_se) then
+		closebtn_se.setPosSize(x, y, w, h, 15)
+	endif
+
+	&apos; query button
+	w = e.Width / 8
+	h = 50
+	x = lx
+	y = ly + lh + 5
+	if not isEmpty(querybtn_se) and not isNULL(querybtn_se) then
+		querybtn_se.setPosSize(x, y, w, h, 15)
+	endif
+
+	&apos; 說明列表(calc)裡面的第一欄與第二欄寬度調整
+	w = listbox_se.posSize.Width * 2.54 / 96 * 980 * 1.5
+	on error resume next
+	If is_se_or_stlst = &quot;se&quot; Then  &apos; 搜尋列表
+		with doclbox_se.sheets.getByIndex(0)
+			.getColumns.getByIndex(0).width = w / 10
+			.getColumns.getByIndex(1).width = w - w / 10
+		end With
+	EndIf
+	If is_se_or_stlst = &quot;stlst&quot; Then  &apos; 問題狀態列表
+		with doclbox_se.sheets.getByIndex(0)
+			.getColumns.getByIndex(0).width = w / 10
+			.getColumns.getByIndex(1).width = w / 15
+			.getColumns.getByIndex(2).width = w / 3
+			.getColumns.getByIndex(3).width = w - w / 10 - w / 15 - w / 3
+		end With
+	EndIf
+End Sub
+Sub twinse_windowMoved(e)
+End Sub
+Sub twinse_windowShown(e)
+End Sub
+Sub twinse_windowHidden(e)
+End Sub
+
+</script:module>

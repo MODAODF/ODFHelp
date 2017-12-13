@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="UI" script:language="StarBasic">REM  *****  UI: 產生主視窗（說明視窗）  *****
+Option Explicit
+global window_qh, subWindow_qh as object
+global MFrame_qh as object
+global initDoc_qh, doc_qh as object
+global doclbox_qh  &apos; @TODO: (bug?) 此變數若放上面那行則會出錯
+global listBox_qh, closebtn_qh
+global resizeSbtn_qh, resizeMbtn_qh
+global findNextbtn_qh, findPrevbtn_qh
+global queryFuncBtn_qh, queryKeywordBtn_qh  &apos; 功能查詢, 關鍵字查詢
+global mevt
+
+
+REM *****
+REM **set a new content window:
+REM **Window + Frame
+REM *****
+function initContentWindow(window, subwindow, MFrame)
+	dim frame
+
+    SubWindow = CreateSubWindow(Window, 0, 0, 0, 0)
+	Frame = createUnoService(XFrame)
+	Frame.initialize(SubWindow)
+	Frame.setCreator(MFrame)
+
+	initContentWindow() = frame
+end function
+
+REM *****
+REM **insert data to calc/listbox
+REM *****
+function lboxqh_insertdata(list)
+	dim idx, sheet
+
+	sheet = doclbox_qh.currentController.ActiveSheet
+	sheet.unprotect(PAWD_CALC_LISTBOX)
+
+	sheet.rows.removeByIndex(1, 65535)
+	for idx = 0 to ubound(list)
+		sheet.getCellByPosition(1, idx + 1).string = list(idx)
+	next
+	sheet.protect(PAWD_CALC_LISTBOX)
+end function
+
+REM *****
+REM **查詢文件中的某段字, 並更換文字背景顏色
+REM *****
+function maskButtons(enabled as boolean)
+	dim btns, idx
+
+	btns = array(closebtn_qh, resizeSbtn_qh, resizeMbtn_qh,_
+				 findNextbtn_qh, findPrevbtn_qh, queryFuncBtn_qh,_
+				 queryKeywordBtn_qh)
+	for idx = 0 to ubound(btns)
+		btns(idx).model.enabled = enabled
+	next
+end function
+
+REM *****
+REM **顯示說明界面
+REM *****
+function startUI(helpIndexData)
+	dim calbak, idx, frame, parms
+
+	init()
+
+	doc_qh = nothing  &apos; 給預設值避免第二次以後執行，關鍵字查詢會出錯的情況發生
+	doclbox_qh = nothing
+	prerow = nothing
+	func_keyword = &quot;&quot;
+	presearch_keyword = &quot;&quot;
+	initDoc_qh = pyCreateNewDoc(, true)	 &apos; hidden doc used for py*(doc, ...)
+
+	dim tw, th, tx, ty  &apos; t=top window
+	tx = 100: ty = 200: tw = 1024: th = 670
+
+	&apos; 外框
+    Window_qh = CreateTopWindow(tx, ty, tw, th)
+    Window_qh.setBackground(RGB(240, 240, 255))
+
+&apos;Dim oDlgModel, oDlg
+&apos;oDlgModel = CreateUnoService(&quot;com.sun.star.awt.UnoControlDialogModel&quot;)
+&apos;oDlg = CreateUnoService(&quot;com.sun.star.awt.UnoControlDialog&quot;)
+&apos;oDlg.setModel(oDlgModel)
+&apos;odlgModel.Width = tw
+&apos;odlgModel.Height = th
+&apos;odlgModel.title = &quot;dd&quot;
+&apos;oDlg.createPeer(CreateUnoService(&quot;com.sun.star.awt.Toolkit&quot;), null)
+&apos;odlg.execute()
+&apos;window_qh = odlg.peer
+If true Then
+	&apos; index 列表
+	mevt = CreateUnoListener(&quot;lboxqh_&quot;, XEnhancedMouseClickHandler)
+	parms = MakeListBoxCtrl(window_qh, mframe_qh, mevt, array(&quot;關鍵字數&quot;, &quot;文件列表&quot;))
+	doclbox_qh = parms(0)
+	listbox_qh = parms(1)
+	lboxqh_insertdata(helpIndexData)
+	&apos; 關閉
+	calbak = CreateUnoListener(&quot;actqh_&quot;, XActionListener)
+    closebtn_qh = MakeBtnCtl(Window_qh, &quot;關閉&quot;, &quot;close&quot;, calbak)
+	&apos; 縮小
+    resizeSbtn_qh = MakeBtnCtl(Window_qh, &quot;-&quot;, &quot;resizeS&quot;, calbak)
+	&apos; 放大
+    resizeMbtn_qh = MakeBtnCtl(Window_qh, &quot;+&quot;, &quot;resizeM&quot;, calbak)
+	&apos; 功能查詢
+    queryFuncBtn_qh = MakeBtnCtl(Window_qh, &quot;功能查詢&quot;, &quot;queryFunc&quot;, calbak)
+	&apos; 關鍵字查詢
+    queryKeywordBtn_qh = MakeBtnCtl(Window_qh, &quot;關鍵字查詢&quot;, _
+                                    &quot;queryKeyword&quot;, calbak)
+	&apos; 關鍵字查詢: find prev
+    findPrevbtn_qh = MakeBtnCtl(Window_qh, &quot;︿&quot;, &quot;findPrev&quot;, calbak)
+	&apos; 關鍵字查詢: find next
+    findNextbtn_qh = MakeBtnCtl(Window_qh, &quot;﹀&quot;, &quot;findNext&quot;, calbak)
+
+	&apos; main frame for content window
+
+	MFrame_qh = createUnoService(&quot;com.sun.star.frame.Frame&quot;)
+	MFrame_qh.initialize(Window_qh)
+	&apos;MFrame_qh.setCreator(stardesktop)
+
+	calbak = CreateUnoListener(&quot;twinqh_&quot;, XWindowListener)
+	Window_qh.addWindowListener(calbak)
+
+	calbak = CreateUnoListener(&quot;twinqh_&quot;, XKeyListener)
+	Window_qh.addKeyListener(calbak)
+
+	initContentWindow(window_qh, subwindow_qh, MFrame_qh)
+	twinqh_windowResized(window_qh.possize)  &apos; set size
+endif
+
+&apos;MFrame_qh = createUnoService(&quot;com.sun.star.frame.Frame&quot;)
+&apos;MFrame_qh.initialize(StarDesktop.ActiveFrame.ContainerWindow)
+&apos;MFrame_qh.setCreator(stardesktop)
+&apos;mframe_qh.Name = &quot;yyy&quot;
+&apos;mframe_qh.setComponent(window_qh, null)
+&apos;stardesktop.frames.append(mframe_qh)
+&apos; MFrame_qh.Title = &quot;uuu&quot;
+&apos; window_qh.setPosSize(tx,ty+500,tw,th,15)
+&apos; msgbox  MFrame_qh.Title
+end function
+
+
+REM *****
+REM **Callbacks
+REM *****
+
+Sub lboxqh_disposing(e)
+End Sub
+function lboxqh_mousePressed(e)
+	lbox_selectItem_qh(e)
+	lboxqh_mousePressed = false
+End Function
+function lboxqh_mouseReleased(e)
+	lboxqh_mouseReleased = false
+End function
+Sub actqh_disposing(e)
+End Sub
+REM *****
+REM **button click:
+REM **通用按鈕觸發事件
+REM *****
+Sub actqh_actionPerformed(e)
+	select case e.actionCommand
+		case &quot;close&quot;:
+			actClose_qh(e)  &apos; 關閉視窗
+		case &quot;resizeS&quot;:
+			actResize_qh(&quot;s&quot;)  &apos;　縮小說明
+		case &quot;resizeM&quot;:
+			actResize_qh(&quot;m&quot;)  &apos;  放大說明
+		case &quot;queryKeyword&quot;:
+			queryKeyword(doc_qh)  &apos;  關鍵字查詢
+		case &quot;queryFunc&quot;:
+			queryFunc()  &apos;  功能查詢
+		case &quot;findPrev&quot;:
+			findNextPrevKeyword(doc_qh, -1)  &apos;  往上一筆關鍵字查詢結果
+		case &quot;findNext&quot;:
+			findNextPrevKeyword(doc_qh, 1)  &apos;  往下一筆關鍵字查詢結果
+	end select
+end sub
+
+Sub twinqh_disposing(e)
+	actClose_qh(e)
+End Sub
+Sub twinqh_windowResized(e)
+	resizeUIWindow_qh(e)
+End Sub
+Sub twinqh_windowMoved(e)
+End Sub
+Sub twinqh_windowShown(e)
+End Sub
+Sub twinqh_windowHidden(e)
+End Sub
+Sub twinqh_keyPressed(e)
+	&apos; https://www.openoffice.org/api/docs/common/ref/com/sun/star/awt/Key.html
+	&apos; ESC = 1281
+	If e.keyCode = 1281 Then actClose_qh(e)  &apos; 關閉視窗
+End Sub
+Sub twinqh_keyReleased(e)
+End Sub
+
+</script:module>

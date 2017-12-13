@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="OP" script:language="StarBasic">REM  *****  Menu OPs  *****
+Option Explicit
+public selCateIdx
+public selForumIdx
+
+REM *****
+REM **main op: 顯示延伸套件(公務文件範本)
+REM *****
+function doNDCCollection()
+	on error goto ndcnotfound
+	BasicLibraries.loadLibrary(&quot;Basicc&quot;)
+	Basicc.Module2.Main
+	exit function
+ndcnotfound:
+	msgbox &quot;請先安裝延伸套件(公務文件範本)!&quot;
+end function
+
+REM *****
+REM **main op: 顯示小幫手視窗
+REM *****
+function doHelp()
+	startUI(pyGetHelpIndex(&quot;&quot;))
+end function
+
+REM *****
+REM **main op: 審核列表
+REM *****
+function doStatusList()
+	Dim datas
+
+	init()
+	if not tryQALoginNewUser() Then Exit Function
+	datas = pyGetQATopicStatusList(QAUserData(&quot;username&quot;),_
+								   QAUserData(&quot;partid&quot;),_
+								   QAUserData(&quot;email&quot;))
+	startUI_se(datas, &quot;stlst&quot;)
+end function
+
+REM *****
+REM **main op: QA 問題回報 dialog
+REM *****
+function doQA()
+	dim dlg, data
+
+	init()
+
+	if not tryQALoginNewUser() Then Exit Function
+
+	selCateIdx = -1: selForumIdx = -1
+	dlg = createunodialog(DialogLibraries.NDCHelp.QA)
+
+	dlg.getControl(&quot;username&quot;).Text = QAUserData(&quot;username&quot;)
+	dlg.getControl(&quot;partid&quot;).Text = QAUserData(&quot;partid&quot;)
+	dlg.getControl(&quot;email&quot;).Text = QAUserData(&quot;email&quot;)
+
+	on error resume next
+    dlg.getControl(&quot;ComboBox1&quot;).model.stringItemList = pyGetQACateList()
+	on error goto 0
+
+	dlg.execute()
+end function
+
+REM *****
+REM **main op: 搜尋 QA
+REM *****
+function doSearchQA(optional keyword)
+	Dim searchdatas
+
+	init()
+	if not tryQALoginNewUser() Then Exit Function
+
+	If ismissing(keyword) Then  &apos; 主進入點: 詢問關鍵字
+		keyword = inputbox(&quot;輸入關鍵字&quot;)
+	EndIf
+	If trim(keyword) = &quot;&quot; Then Exit Function
+
+	searchdatas = pyGetQASearchList(keyword)
+
+	On Local Error GoTo err
+	If ubound(searchdatas) = -1 Then
+		msgbox &quot;查詢無結果&quot;
+		Exit function
+	EndIf
+
+	actClose_qh(nothing)  &apos; 從其他功能進來：關閉自己的視窗
+	startUI_se(searchdatas, &quot;se&quot;)  &apos; 才開啟搜尋結果視窗
+err:
+end function
+
+REM *****
+REM **QA 問題回報: 送出問題
+REM *****
+function onQASubmit(e)
+	dim dlg, ret, vblf
+	dim uname, email, depart, subject, message, afile
+	vbLf = chr(10)
+
+	dlg = e.Source.Context
+	uname = trim(dlg.getControl(&quot;username&quot;).Text)
+	depart = trim(dlg.getControl(&quot;partid&quot;).Text)
+	email = trim(dlg.getControl(&quot;email&quot;).Text)
+	subject = trim(dlg.getControl(&quot;title&quot;).Text)
+	message = trim(dlg.getControl(&quot;desc&quot;).Text)
+	afile = trim(dlg.getControl(&quot;FileControl1&quot;).Text)
+
+	if uname = &quot;&quot; or depart = &quot;&quot; or email = &quot;&quot; or _
+		subject = &quot;&quot; or message = &quot;&quot; or selForumIdx = -1 Then
+		msgbox &quot;所有欄位必填&quot;
+		exit function
+	endif
+
+	ret = msgbox(&quot;確認送出？&quot;, 4)
+	if ret = 7 then exit function
+
+	dlg.endExecute()
+
+	&apos; 送出表單資料到 forum	 (附帶偵測到的作業系統)
+	message = message &amp; vbLf &amp; &quot;=====&quot; &amp; vbLf &amp; &quot;作業系統：&quot; &amp; getOS()
+	message = message &amp; vbLf &amp; &quot;應用工具：&quot; &amp; getProductName()
+	message = message &amp; vbLf &amp; &quot;小 幫 手：&quot; &amp; getMyNameVersion()
+	ret = pySubmitForum(selCateIdx, selForumIdx, uname, email,_
+						depart, subject, message, afile)
+	if ret then
+		msgbox &quot;已送出回報問題&quot;
+	else
+		msgbox &quot;送出回報問題失敗&quot;
+	EndIf
+end function
+
+REM *****
+REM **選取分類一: 列表分類二
+REM *****
+function onSelQACateList(e)
+	selCateIdx = e.selected
+	e.source.Context.getControl(&quot;ComboBox2&quot;).model.stringItemList =_
+		pyGetQAForumList(selCateIdx, -1)
+end function
+
+REM *****
+REM **選取分類二
+REM *****
+function onSelQAForumList(e)
+	selForumIdx = e.selected
+end function
+</script:module>

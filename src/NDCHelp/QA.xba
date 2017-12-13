@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="QA" script:language="StarBasic">REM  *****  QA series  *****
+Option Explicit
+
+REM *****
+REM **user data: 模擬 name:value 取值
+REM *****
+Function QAUserData(field)
+	Dim data
+
+	data = split(getUserData(), &quot;,&quot;)
+	Select Case field
+		Case &quot;username&quot;
+			QAUserData() = trim(data(0))
+		Case &quot;partid&quot;
+			QAUserData() = trim(data(1))
+		Case &quot;email&quot;
+			QAUserData() = trim(data(2))
+		Case Else
+			QAUserData() = &quot;&quot;
+	End Select
+End Function
+
+REM *****
+REM **QA: login to new user
+REM **使用QA功能前都要先檢查 userdata 有沒有寫入使用者資訊
+REM *****
+Function tryQALoginNewUser()
+	&apos; 跳 dialog 輸入使用者資訊
+	If getUserData() = &quot;,,&quot; Or getUserData() = &quot;&quot; Then
+		setUserDataFromDlg()
+	EndIf
+
+	If getUserData() = &quot;,,&quot; Or getUserData() = &quot;&quot; Then
+		tryQALoginNewUser() = false
+	Else
+		tryQALoginNewUser() = true
+	endif
+End Function
+
+REM *****
+REM **以部門代號查詢部門名稱
+REM **查詢依據 ods 檔: https://data.gov.tw/dataset/7307 (行政院所屬中央及地方機關代碼)
+REM *****
+sub getPartNameById(e)
+	dim doc, sheet, dlg, desc, validate, found, ret, props(1)
+
+	dlg = e.Source.context
+	validate = dlg.getControl(&quot;OptionButton1&quot;).Model
+	props(0) = MakePropertyValue(&quot;AsTemplate&quot;, true)
+	props(1) = MakePropertyValue(&quot;Hidden&quot;, true)
+	doc = stardesktop.loadComponentFromUrl(_
+			getModulePath() &amp; &quot;/orglist.ods&quot;, &quot;_blank&quot;, 0, props)
+
+	sheet = doc.currentController.ActiveSheet
+	desc = sheet.createSearchDescriptor()
+	With desc
+		.SearchString = dlg.getControl(&quot;partid&quot;).Text
+		.SearchWords = true
+		.SearchCaseSensitive = true
+	End With
+	found = sheet.findFirst(desc)
+
+	If isnull(found) Then
+		ret = &quot;查詢無結果&quot;
+		validate.state = false
+	Else
+		With found.celladdress
+			If .column &lt;&gt; 0 Then
+				ret = &quot;請輸入代碼&quot;
+				validate.state = false
+			Else
+				ret = sheet.getCellByPosition(.column+1, .row).String
+				validate.state = true
+			EndIf
+		end With
+	EndIf
+
+	doc.close(false)
+	dlg.getControl(&quot;Label4&quot;).Model.Label = ret
+End sub
+
+REM *****
+REM **get user data from .txt
+REM *****
+Function getUserData()
+	Dim sfa, istream, tstream, buff
+
+	buff = &quot;&quot;
+	sfa = CreateUnoService(SimpleFileAccess)
+	If sfa.exists(userDataFileUrl()) Then
+		istream = sfa.openFileRead(userDataFileUrl())
+		tstream = CreateUnoService(TextInputStream)
+		tstream.setInputStream(istream)
+		while not tstream.isEOF()
+			buff = buff &amp; tstream.readLine()
+		Wend
+	EndIf
+	getUserData() = trim(buff)
+End Function
+
+REM *****
+REM **save user data to .txt
+REM *****
+Function save2UserConfig(username, partid, email)
+	Dim sfa, ostream, tstream, buf
+
+	buf = username &amp; &quot;,&quot; &amp; partid &amp; &quot;,&quot; &amp; email
+
+	sfa = CreateUnoService(SimpleFileAccess)
+	ostream = sfa.openFileWrite(userDataFileUrl())
+	tstream = CreateUnoService(TextOutputStream)
+	tstream.setEncoding(&quot;UTF-8&quot;)
+	tstream.setOutputStream(ostream)
+	tstream.writeString(buf)
+	ostream.closeOutput()
+End Function
+
+REM *****
+REM **驗證欄位
+REM *****
+Sub validateQALogin(e)
+	Dim ret, dlg, username, partid, email
+
+	dlg = e.Source.context
+	username = trim(dlg.getControl(&quot;username&quot;).Text)
+	partid = trim(dlg.getControl(&quot;partid&quot;).Text)
+	email = trim(dlg.getControl(&quot;email&quot;).Text)
+	If username = &quot;&quot; Or partid = &quot;&quot; Or email = &quot;&quot; Then
+		msgbox &quot;所有欄位為必填&quot;
+		Exit Sub
+	EndIf
+	If dlg.getControl(&quot;OptionButton1&quot;).Model.State = false Then
+		msgbox &quot;單位代碼驗證失敗&quot;
+		Exit Sub
+	EndIf
+	dlg.endDialog(1)
+End Sub
+
+REM *****
+REM **開啟登入表單，輸入資料後將資料存到 .txt
+REM **存到 .txt 前會
+REM **1) 檢查是否已存在使用者資料
+REM **2) log uid, mac address to server
+REM **3) rest sql insert
+REM *****
+Function setUserDataFromDlg()
+	Dim ret, dlg, username, partid, email, uid, user
+
+	dlg = createunodialog(DialogLibraries.NDCHelp.QALogin)
+	ret = dlg.execute()
+	If ret = 0 Then Exit Function
+
+	username = trim(dlg.getControl(&quot;username&quot;).Text)
+	partid = trim(dlg.getControl(&quot;partid&quot;).Text)
+	email = trim(dlg.getControl(&quot;email&quot;).Text)
+
+	&apos; 檢查使用者帳號.
+	user = pyUserExist(username, partid, email)
+	If ubound(user) &gt; 0 Then uid = user(1)
+
+	If user(0) = &quot;email&quot; Then
+		msgbox &quot;該email已註冊，請使用其他email&quot;
+		Exit Function
+	EndIf
+	If user(0) = &quot;namedepart&quot; Then
+		msgbox &quot;該單位使用者已註冊，請使用其他名稱&quot;
+		Exit Function
+	EndIf
+	If user(0) = &quot;all&quot; And uid &gt; 0 Then  &apos; 已有該帳號：顯示警告訊息
+		msgbox &quot;歡迎回來繼續使用QA問題回報程式，您可繼續查詢先前提問的記錄。&quot;
+		ret = pylogQAUserMeta(uid)
+		If ret Then
+			save2UserConfig(username, partid, email)
+			Exit Function
+		EndIf
+	EndIf
+	&apos; 沒有帳號：新增
+	if pyAddNewUser(username, partid, email) Then  &apos; rest sql insert
+		user = pyUserExist(username, partid, email)
+		If ubound(user) &gt; 0 and user(1) &gt; 0 Then
+			ret = pylogQAUserMeta(user(1))
+			If ret then
+				save2UserConfig(username, partid, email)  &apos; 新增帳號
+				Exit Function
+			EndIf
+		EndIf
+	EndIf
+&apos;	Else
+		msgbox &quot;伺服器連線失敗! 無法更新使用者資訊&quot;
+&apos;	EndIf
+End Function
+
+REM *****
+REM **部門代號：有字才開放可以驗證(按鈕)
+REM *****
+Sub partid_updated(e)
+	Dim enabled As boolean
+
+	if e.source.Text &lt;&gt; &quot;&quot; Then enabled = true
+	e.Source.context.getControl(&quot;CommandButton2&quot;).model.enabled = enabled
+End Sub
+
+</script:module>

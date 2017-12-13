@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Action" script:language="StarBasic">REM  ***** 核心函式 *****
+Option Explicit
+const TEMPLATE_ODT = &quot;template.odt&quot;  &apos; for help
+Const SEARCHQA_ODT = &quot;searchresult.odt&quot;  &apos; for QA search
+const CONTENT_XML = &quot;content.xml&quot;
+const Package = &quot;com.sun.star.packages.Package&quot;
+const AsyncCallback = &quot;com.sun.star.awt.AsyncCallback&quot;
+const XCallback = &quot;com.sun.star.awt.XCallback&quot;
+global picserials
+Global helpContOpened As Boolean  &apos; 防呆：預防文件點太快
+
+
+REM *****
+REM **讀取並回傳 odt(zip) 某筆檔案內容
+REM *****
+function readFileContentFromZipStream(istream, idx)
+	dim tstream, buff
+
+	tstream = CreateUnoService(TextInputStream)
+	tstream.setInputStream(istream)
+
+	while not tstream.isEOF()
+		buff = buff &amp; tstream.readLine()
+	wend
+	tstream.closeInput()
+
+	readFileContentFromZipStream() = buff
+end function
+
+REM *****
+REM **更新 odt(zip) 中的檔案內容:
+REM **來源為 restful data
+REM *****
+function updateZipSerialFile(istream, idx, ttype, extra)
+	dim sfa, tstream, ostream, tmp, buff
+
+	&apos; 讀取 stream：原始的 zip serial file
+	buff = readFileContentFromZipStream(istream, idx)
+	&apos; 置換:格式化成 odt
+	If ttype=&quot;qh&quot; Then  &apos; for HELP
+		tmp = pyFormatDoc(buff, idx, func_keyword)
+		picserials = tmp(1)
+		buff = tmp(0)
+	ElseIf ttype=&quot;se&quot; Then  &apos; for QA search
+		tmp = pyFormatDocQA(buff, idx, extra)
+		buff = tmp
+	EndIf
+
+	&apos; ostream: 給 zip Package replace 更新用
+	sfa = CreateUnoService(SimpleFileAccess)
+	ostream = sfa.openFileWrite(getTmpFileName())  &apos; 開暫存檔供寫入
+	tstream = CreateUnoService(TextOutputStream)
+	tstream.setOutputStream(ostream)
+	tstream.writeString(buff)  &apos; 寫入
+
+	updateZipSerialFile() = ostream
+end function
+
+REM *****
+REM **將內容轉成 odt　（ａ）:
+REM **1) zip 取出 content.xml
+REM **2) 內容套到 content.xml 中
+REM *****
+function generateContentODT(docFileUrl, idx, ttype, extra)
+	dim ostream
+	dim contentName, contentStream
+	dim zipPkg
+
+	zipPkg = CreateUnoService(Package)
+	zipPkg.initialize(array(docFileUrl))
+	If zipPkg.hasByHierarchicalName(CONTENT_XML) Then
+		contentStream = zipPkg.getByHierarchicalName(CONTENT_XML)
+		ostream = updateZipSerialFile(ContentStream.getInputStream(),_
+									  idx, ttype, extra)
+	End If
+	generateContentODT() = ostream
+end function
+
+REM *****
+REM **將內容轉成 odt　（ｂ）:
+REM **zip 更新
+REM *****
+function commitZipOdt(ostream, docFileUrl, idx)
+	dim contentName, contentStream
+	dim zipFolder, zipPkg
+
+	zipPkg = CreateUnoService(Package)
+	zipPkg.initialize(array(docFileUrl))
+	zipFolder = zipPkg.getByHierarchicalName(&quot;/&quot;)
+	contentStream = zipPkg.createInstanceWithArguments(array(false))
+	contentStream.setInputStream(ostream)
+	zipFolder.replaceByName(CONTENT_XML, contentStream)
+	zipPkg.commitChanges()
+end function
+
+REM *****
+REM **將說明內容轉成 odt
+REM *****
+function getHelpContentDocUri(idx, ttype, extra)
+	dim ostream, docFileUrl, template
+	dim zipFolder, zipPkg
+
+	&apos; 複製樣板(odt)
+	docFileUrl = getTmpFileName()
+
+	&apos; load template file
+	template = TEMPLATE_ODT  &apos; for HELP
+	If ttype = &quot;se&quot; Then template = SEARCHQA_ODT  &apos; or for QA search
+	filecopy(getModulePath + &quot;/&quot; + template, docFileUrl)
+
+	&apos; 將 rest data 套到樣板(odt)中, 並更新 odt
+	ostream = generateContentODT(docFileUrl, idx, ttype, extra)
+	commitZipOdt(ostream, docFileUrl, idx)
+&apos;msgbox docfileurl
+	getHelpContentDocUri() = docFileUrl
+end function
+
+REM *****
+REM **非同步處理：開啟文件後置換圖片
+REM *****
+Sub AsyncCall_notify(doc)
+	dim range, cursor, idx, picCount, picsize
+	wait 500  &apos; 設定 delay 非同步才有作用, 否則畫面會卡住
+
+	on error goto err  &apos; 當開啟文件後很快關閉視窗，則有可能會產生錯誤(前面的 wait 也許有避開...)
+	picCount = doc.GraphicObjects.count
+	if picCount = 0 Then
+		helpContOpened = true
+		exit sub  &apos; 沒圖片則不處理
+	EndIf
+
+	dim pics(picCount - 1)
+
+	for idx = 0 to picCount - 1  &apos; 下一段的置換後該圖片就消失了，因此先存成變數
+		pics(idx) = doc.GraphicObjects.getByIndex(idx)
+	next
+	for idx = 0 to picCount - 1  &apos; 置換圖片
+		picsize = pics(idx).getSize()
+		range = pics(idx).anchor
+		cursor = range.text.createTextCursor()
+		cursor.gotoRange(range, false)  &apos; cursor 先跳到該圖片位置
+
+		range.text.removeTextContent(pics(idx))  &apos; 移除圖片
+		&apos; 新增圖片, 圖片來源 pyFormatDoc()
+		pyCreateNewPicObj(picserials(idx), doc, cursor,_
+						  picsize.Width, picsize.Height)
+	Next
+
+&apos;Dim pointer
+&apos;pointer = createunoservice(&quot;com.sun.star.awt.Pointer&quot;)
+&apos;pointer.setType(com.sun.star.awt.SystemPointer.ARROW)
+&apos;window_qh.setPointer(pointer)
+&apos;subwindow_qh.setPointer(pointer)
+
+err:
+	helpContOpened = true
+end sub
+
+REM *****
+REM **open document (from restful data) into content window
+REM **hide all docking window, set zoom value to fit to page(optima view)
+REM *****
+function loadDoc(Frame, doc, idx, ttype, extra)
+	dim contentUri
+
+&apos;Dim pointer
+&apos;pointer = createunoservice(&quot;com.sun.star.awt.Pointer&quot;)
+&apos;pointer.setType(com.sun.star.awt.SystemPointer.WAIT)
+&apos;window_qh.setPointer(pointer)
+&apos;subwindow_qh.setPointer(pointer)
+&apos;doclbox_qh.getCurrentController().getFrame().getContainerWindow().setPointer(pointer)
+&apos;listbox_qh.setPointer(pointer)
+
+	helpContOpened = false
+	contentUri = getHelpContentDocUri(idx, ttype, extra)
+
+	&apos; 開啟空白文件，插入文字到唯讀的 section
+	doc = Frame.loadComponentFromUrl(_
+			&quot;private:factory/swriter&quot;, &quot;_self&quot;, 0, array())
+	insertProtectSection(frame, contentUri)
+
+	pyHideAllUI(doc, frame)
+	with doc.currentController.viewSettings
+		.zoomType = 0
+		.zoomValue = 245
+	end with
+	doc.currentController.viewCursor.gotoStart(false)
+
+	If ttype = &quot;se&quot; Then
+		helpContOpened = true
+		Exit Function  &apos; QA search: no pics
+	EndIf
+
+	&apos; 開啟後非同步置換真正的圖片
+	dim async, callback
+	aSync = CreateUnoService(AsyncCallback)
+	callback = CreateUnoListener(&quot;AsyncCall_&quot;, XCallback)
+	aSync.addCallback(callback, doc)
+end function
+
+</script:module>

@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="UI_calbak" script:language="StarBasic">REM  *****  Callbaks for UI  *****
+Option Explicit
+global prerow  &apos; preselect calc row
+
+REM *****
+REM **listbox: click
+REM **選取索引顯示說明於　content window
+REM *****
+function lbox_selectItem_qh(e)
+	dim frame, sheet, row, idx
+
+	if e.clickCount &lt;&gt; 1 then exit function
+
+	on error goto err
+	sheet = doclbox_qh.currentController.ActiveSheet
+	idx = e.target.getCellAddress.Row
+
+	if not helpContOpened Then Exit Function  &apos; pass for content opened
+	if idx = 0 then exit function  &apos; pass for header
+	if trim(sheet.getCellByPosition(1, idx).string) = &quot;&quot; then
+		&apos; 不處理沒字區域
+		exit function
+	endif
+
+	maskButtons(false)
+	row = sheet.rows.getByIndex(idx)
+
+	&apos; 關閉先前開啟的 content window
+	if not isNull(doc_qh) then doc_qh.close(false)
+	subwindow_qh.dispose()
+
+	frame = initContentWindow(window_qh, subwindow_qh, MFrame_qh)  &apos; create new
+	loadDoc(Frame, doc_qh, idx - 1, &quot;qh&quot;, &quot;&quot;)  &apos; 載入說明
+
+	if sheet.getCellByPosition(0, idx).string &lt;&gt; 0 then
+		searchDoc(doc_qh, presearch_keyword, false)
+	endif
+
+	twinqh_windowResized(window_qh.possize)
+
+	&apos; 反白/還原區域
+	sheet.unprotect(PAWD_CALC_LISTBOX)
+	row.cellBackColor = SEARCH_COLOR_SEARCHED
+	if not isEmpty(prerow) and not isNull(prerow) then
+		if prerow.AbsoluteName &lt;&gt; row.AbsoluteName then
+			prerow.cellBackColor = SEARCH_COLOR_NORMAL
+		endif
+	endif
+	sheet.protect(PAWD_CALC_LISTBOX)
+
+	prerow = row
+err:
+	maskButtons(true)
+End function
+
+REM *****
+REM **close button: click
+REM **關閉視窗, 結束程式
+REM *****
+function actClose_qh(e)
+	dim docs, idx
+
+	on error resume next
+	doclbox_qh.currentController.removeEnhancedMouseClickHandler(mevt)
+	&apos;on error goto 0
+
+	docs = Array(doc_qh, initdoc_qh, doclbox_qh, doc_se, doclbox_se)
+	for idx = lbound(docs) to ubound(docs)
+		if not isNull(docs(idx)) or not isEmpty(docs(idx)) then
+			If HasUNOInterfaces(docs(idx), XCloseable) then
+				docs(idx).close(false)
+			Else
+				&apos;on error resume next
+				docs(idx).dispose()
+				&apos;on error goto 0
+			End If
+		endif
+	next
+	window_qh.dispose()
+	window_st.dispose()
+	window_se.dispose()
+end function
+
+REM *****
+REM **resize button: click
+REM **說明區域縮放
+REM *****
+Sub actResize_qh(scaleType)
+	dim scaleStep
+
+	scaleStep = 10
+	if scaleType = &quot;s&quot; then scaleStep = -10
+
+	if not isNull(doc_qh) then
+		with doc_qh.currentController.viewSettings
+			.zoomType = 3
+			.zoomValue = .zoomValue + scaleStep
+		end with
+	endif
+End Sub
+
+REM *****
+REM **window resize: 重新計算並設定視窗及元件大小位置
+REM *****
+function resizeUIWindow_qh(e)
+	&apos; listbox
+	dim lw, lh, lx, ly  &apos; l=list box
+	lx = 20: ly = 10: lw = e.Width/2.5: lh = e.Height - 80
+	listbox_qh.setPosSize(lx, ly, lw, lh, 15)
+
+	&apos; subwindow
+	dim possize, x, y, w, h
+	possize = listBox_qh.posSize
+	x = possize.x + possize.Width + 20
+	y = 10
+	w = window_qh.Size.Width - possize.Width - 60
+	h = possize.Height
+	if not isEmpty(subwindow_qh) and not isNULL(subwindow_qh) then
+		subwindow_qh.setPosSize(x, y, w, h, 15)
+	endif
+
+	&apos; close button
+	w = e.Width / 10
+	h = 50
+	x = e.Width - 10 - w
+	y = ly + lh + 5
+	if not isEmpty(closebtn_qh) and not isNULL(closebtn_qh) then
+		closebtn_qh.setPosSize(x, y, w, h, 15)
+	endif
+
+	&apos; resize-to-small(step) button
+	w = e.Width / 20
+	h = 50
+	x = x - w
+	y = ly + lh + 5
+	if not isEmpty(resizeSbtn_qh) and not isNULL(resizeSbtn_qh) then
+		resizeSbtn_qh.setPosSize(x, y, w, h, 15)
+	endif
+
+	&apos; resize-to-Large(step) button
+	x = x - w
+	if not isEmpty(resizeMbtn_qh) and not isNULL(resizeMbtn_qh) then
+		resizeMbtn_qh.setPosSize(x, y, w, h, 15)
+	endif
+
+	&apos; 功能查詢
+	possize = listBox_qh.posSize
+	w = e.Width / 15
+	x = possize.x
+	if not isEmpty(queryFuncBtn_qh) and not isNULL(queryFuncBtn_qh) then
+		queryFuncBtn_qh.setPosSize(x, y, w, h, 15)
+	endif
+
+	&apos; 關鍵字查詢
+	if not isEmpty(subwindow_qh) and not isNULL(subwindow_qh) then
+		possize = subwindow_qh.posSize
+		w = e.Width / 10
+		x = possize.x
+		if not isEmpty(queryKeywordBtn_qh) and not isNULL(queryKeywordBtn_qh) then
+			queryKeywordBtn_qh.setPosSize(x, y, w, h, 15)
+		endif
+	endif
+
+	&apos; find prev(關鍵字查詢) button
+	if not isEmpty(queryKeywordBtn_qh) and not isNULL(queryKeywordBtn_qh) then
+		possize = queryKeywordBtn_qh.posSize
+		w = e.Width / 20
+		h = 50
+		x = possize.x + possize.Width
+		y = possize.y
+		if not isEmpty(findPrevbtn_qh) and not isNULL(findPrevbtn_qh) then
+			findPrevbtn_qh.setPosSize(x, y, w, h, 15)
+		endif
+	endif
+
+	&apos; find next(關鍵字查詢) button
+	if not isEmpty(queryKeywordBtn_qh) and not isNULL(queryKeywordBtn_qh) then
+		possize = findPrevbtn_qh.posSize
+		w = e.Width / 20
+		h = 50
+		x = possize.x + possize.Width
+		y = possize.y
+		if not isEmpty(findNextbtn_qh) and not isNULL(findNextbtn_qh) then
+			findNextbtn_qh.setPosSize(x, y, w, h, 15)
+		endif
+	endif
+
+	&apos; 說明列表(calc)裡面的第一欄與第二欄寬度調整
+	w = listbox_qh.posSize.Width * 2.54 / 96 * 980 * 1.5
+	on error resume next
+	with doclbox_qh.sheets.getByIndex(0)
+		.getColumns.getByIndex(0).width = w / 10
+		.getColumns.getByIndex(1).width = w - w / 10
+	end with
+End function
+</script:module>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Search" script:language="StarBasic">REM  *****  功能查詢 &amp; 關鍵字查詢  *****
+Option Explicit
+global func_keyword as string &apos; 功能查詢的關鍵字
+global presearch_keyword as string  &apos; 前次關鍵字查詢的關鍵字
+global findCurIdx as integer  &apos; 查詢結果移動用的位置
+
+REM *****
+REM **查詢文件中的某段字, 並更換文字背景顏色
+REM **normal=true 還原顏色為黑色
+REM **傳回值：查到的數量
+REM *****
+function searchDoc(doc, keyword, normal as boolean) as integer
+	dim search, found
+
+	search = doc.createSearchDescriptor()
+	search.SearchString = keyword
+	search.SearchRegularExpression = False
+
+	found = doc.findFirst(search)
+	while not isNull(search) and not isNull(found)
+		if normal then
+			found.CharBackColor = SEARCH_COLOR_NORMAL
+		else
+			found.CharBackColor = SEARCH_COLOR_SEARCHED
+		endif
+		found = doc.findNext(found.end, search)
+	wend
+
+	searchDoc() = doc.findAll(search).getCount()
+end function
+
+REM *****
+REM **依照前次查詢結果指定游標往上或往下
+REM **@param amount int 正或負值 往上或往下
+REM *****
+function findNextPrevKeyword(doc, amount as integer)
+	dim search, found, range, idx
+
+	if isNull(doc) then exit function
+
+	search = doc.createSearchDescriptor()
+	search.SearchString = presearch_keyword  &apos; 前次查詢關鍵字
+	search.SearchRegularExpression = False
+	found = doc.findAll(search)
+
+	&apos; 檢查 amount 移動量有沒超出範圍
+	if findCurIdx + amount &gt;= 0 and findCurIdx + amount &lt; found.getCount() then
+		findCurIdx = findCurIdx + amount
+	endif
+
+	&apos; 還原查詢結果的顏色
+	for idx = 0 to found.getCount() - 1
+		found.getByIndex(idx).CharBackColor = SEARCH_COLOR_SEARCHED
+	next
+	&apos; 移動後就換顏色
+	if not isNull(found) and found.getCount() &gt; findCurIdx then
+		range = found.getByIndex(findCurIdx).getStart()
+		found.getByIndex(findCurIdx).CharBackColor = SEARCH_COLOR_CURRENT
+		doc.currentController.viewCursor.gotoRange(range, false)
+	endif
+end function
+
+REM *****
+REM **全域查詢：查詢列表內所有文件符合關鍵字，並將查詢的數量顯示於列表上
+REM *****
+function searchGlobal(keyword)
+	dim sheet, doc, contentUri
+	dim idx, max as integer
+
+	maskButtons(false)
+
+	sheet = doclbox_qh.currentController.ActiveSheet
+	idx = 1  &apos; pass for header
+
+	&apos; 重設顯示數量欄位
+	while trim(sheet.getCellByPosition(1, idx).string) &lt;&gt; &quot;&quot;
+		sheet.getCellByPosition(0, idx).string = &quot;---&quot;
+		idx = idx + 1
+	wend
+	max = idx
+	&apos; 開啟列表每一份文件，將文件搜尋結果（數量）記到列表中
+	for idx = 1 to max - 1
+		contentUri = getHelpContentDocUri(idx - 1, &quot;qh&quot;, &quot;&quot;)
+		doc = pyCreateNewDoc(contentUri, true)
+
+		sheet.getCellByPosition(0, idx).string = _
+					searchDoc(doc, keyword, true)
+		doc.close(false)
+	next
+
+	maskButtons(true)
+end function
+
+REM *****
+REM **query keyword button: click
+REM **關鍵字查詢(單一文件): 查詢說明內容中的某段字, 並換文字背景顏色
+REM **全域查詢：關鍵字查詢列表所有文件，會將各文件查詢到的數量顯示於列表中
+REM **QA查詢：查詢QA
+REM *****
+function queryKeyword(doc)
+	dim keyword, dlg
+	findCurIdx = -1
+
+	dlg = createunodialog(DialogLibraries.NDCHelp.Find)
+	if dlg.execute() = 0 then exit function
+
+	keyword = dlg.getControl(&quot;TextField1&quot;).text
+	if trim(keyword) = &quot;&quot; then exit function  &apos; 沒輸入就取消
+
+	if dlg.getControl(&quot;OptionButton1&quot;).State then  &apos; 單一文件查詢
+		&apos; 沒開啟說明文件就查詢
+		if isNull(doc) or isEmpty(doc) then
+			msgbox &quot;請先開啟說明&quot;
+			exit function
+		endif
+		searchDoc(doc, presearch_keyword, true)  &apos; 還原前次查詢結果的顏色
+		if searchDoc(doc, keyword, false) = 0 then
+			msgbox &quot;查無結果&quot;
+		endif
+	ElseIf dlg.getControl(&quot;OptionButton2&quot;).State Then &apos; 全域查詢
+		searchGlobal(keyword)
+	Else  &apos; QA查詢
+		doSearchQA(keyword)
+	endif
+	presearch_keyword = keyword
+end function
+
+REM *****
+REM **query func button: click
+REM **查詢關鍵字：查詢符合關鍵字的說明列表
+REM *****
+function queryFunc()
+	&apos; 沒輸入關鍵字則列全部
+	func_keyword = inputbox(&quot;輸入關鍵字&quot;, &quot;關鍵字查詢&quot;)
+
+	prerow = nothing
+&apos;	on error resume next
+	lboxqh_insertdata(pyGetHelpIndex(func_keyword))
+&apos;    on error goto 0
+end function
+
+</script:module>

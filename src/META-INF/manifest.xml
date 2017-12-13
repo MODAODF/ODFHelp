@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest:manifest>
+ <manifest:file-entry manifest:full-path="addon.xcu" manifest:media-type="application/vnd.sun.star.configuration-data"/>
+ <manifest:file-entry manifest:full-path="NDCHelp/" manifest:media-type="application/vnd.sun.star.basic-library"/>
+ <manifest:file-entry manifest:full-path="template.odt" manifest:media-type="text/xml"/>
+ <manifest:file-entry manifest:full-path="dummy.gif" manifest:media-type="image/gif"/>
+ <manifest:file-entry
+    manifest:media-type="application/vnd.sun.star.uno-component;type=Python"
+    manifest:full-path="Python/RestData.py"/>
+ <manifest:file-entry
+    manifest:media-type="application/vnd.sun.star.uno-component;type=Python"
+    manifest:full-path="Python/Utils.py"/>
+ <manifest:file-entry
+    manifest:media-type="application/vnd.sun.star.uno-component;type=Python"
+    manifest:full-path="Python/DocTempl.py"/>
+</manifest:manifest>

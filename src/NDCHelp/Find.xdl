@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="Find" dlg:left="148" dlg:top="95" dlg:width="171" dlg:height="105" dlg:closeable="true" dlg:moveable="true" dlg:title="關鍵字查詢">
+ <dlg:bulletinboard>
+  <dlg:text dlg:id="Label1" dlg:tab-index="1" dlg:left="6" dlg:top="3" dlg:width="129" dlg:height="12" dlg:value="輸入關鍵~字"/>
+  <dlg:button dlg:id="CommandButton1" dlg:tab-index="2" dlg:left="138" dlg:top="3" dlg:width="28" dlg:height="14" dlg:value="確定" dlg:button-type="ok"/>
+  <dlg:button dlg:id="CommandButton2" dlg:tab-index="3" dlg:left="138" dlg:top="21" dlg:width="28" dlg:height="14" dlg:value="取消" dlg:button-type="cancel"/>
+  <dlg:textfield dlg:id="TextField1" dlg:tab-index="0" dlg:left="4" dlg:top="42" dlg:width="161" dlg:height="16"/>
+  <dlg:titledbox dlg:id="FrameControl1" dlg:tab-index="4" dlg:left="6" dlg:top="63" dlg:width="158" dlg:height="36"/>
+  <dlg:radiogroup>
+   <dlg:radio dlg:id="OptionButton1" dlg:tab-index="5" dlg:left="12" dlg:top="68" dlg:width="74" dlg:height="12" dlg:value="單一文件搜尋" dlg:checked="true"/>
+   <dlg:radio dlg:id="OptionButton2" dlg:tab-index="6" dlg:left="12" dlg:top="82" dlg:width="74" dlg:height="12" dlg:value="全域搜尋"/>
+   <dlg:radio dlg:id="OptionButton3" dlg:tab-index="7" dlg:left="90" dlg:top="68" dlg:width="74" dlg:height="12" dlg:value="QA搜尋"/>
+  </dlg:radiogroup>
+ </dlg:bulletinboard>
+</dlg:window>

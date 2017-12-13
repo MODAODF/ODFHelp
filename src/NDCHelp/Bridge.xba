@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Bridge" script:language="StarBasic">REM  *****  Bridge to Python and relate-linked functions *****
+Option Explicit
+
+REM *****
+REM **Bridge: format document to odt
+REM *****
+function pyFormatDoc(templ, idx, keyword)
+	dim obj, arg
+
+	On Local Error GoTo err
+	obj = createunoservice(&quot;ndc.DocTemplImp&quot;)
+
+	if not isNull(obj) then
+		arg = MakeNamedValue(&quot;formatDoc&quot;, array(getmodulepath, templ, idx, keyword))
+		pyFormatDoc() = obj.execute(array(arg))
+	EndIf
+	Exit Function
+err:
+	saveError(&quot;取得內容發生錯誤！&quot;)
+end function
+
+REM *****
+REM **Bridge: format QA search result to odt
+REM *****
+function pyFormatDocQA(templ, idx, breadcrumb)
+	dim obj, arg
+	On Local Error GoTo err
+	obj = createunoservice(&quot;ndc.DocTemplImp&quot;)
+
+	if not isNull(obj) then
+		arg = MakeNamedValue(&quot;formatDocQA&quot;, _
+					array(getmodulepath, templ, idx, breadcrumb))
+		pyFormatDocQA() = obj.execute(array(arg))
+	endif
+	Exit Function
+err:
+	saveError(&quot;取得QA內容發生錯誤！&quot;)
+end function
+
+REM *****
+REM **Bridge: help index
+REM *****
+function pyGetHelpIndex(keyword)
+	dim obj, arg
+
+	on local error goto err
+	obj = createunoservice(&quot;ndc.QAImp&quot;)
+
+	if not isNull(obj) then
+		arg = MakeNamedValue(&quot;helpIndex&quot;, array(getModulePath, keyword))
+		pyGetHelpIndex() = obj.execute(array(arg))
+	endif
+	exit function
+err:
+	saveError(&quot;取得列表發生錯誤！&quot;)
+	pyGetHelpIndex() = array(&quot;&quot;)
+end function
+
+REM *****
+REM **Bridge: 取得分類 一
+REM *****
+function pyGetQACateList()
+	dim obj, arg
+
+	On Local Error GoTo err
+	obj = createunoservice(&quot;ndc.QAImp&quot;)
+
+	if not isNull(obj) then
+		arg = MakeNamedValue(&quot;getQACateList&quot;, array())
+		pyGetQACateList() = obj.execute(array(arg))
+	endif
+	exit function
+err:
+	saveError(&quot;取得問題分類發生錯誤！&quot;)
+end Function
+
+REM *****
+REM **Bridge: 取得分類 二
+REM *****
+function pyGetQAForumList(cateid, getid)
+	dim obj, arg
+
+	On Local Error GoTo err
+	obj = createunoservice(&quot;ndc.QAImp&quot;)
+
+	if not isNull(obj) then
+		arg = MakeNamedValue(&quot;getQAForumList&quot;, array(cateid, getid))
+		pyGetQAForumList() = obj.execute(array(arg))
+	endif
+	exit function
+err:
+	saveError(&quot;取得問題分類發生錯誤！&quot;)
+end function
+
+REM *****
+REM **Bridge: submit to forum
+REM *****
+function pySubmitForum(cateid, forumid, uname, email,_
+					   depart, subject, message, afile)
+	dim obj, arg
+
+	on local error goto err
+	obj = createunoservice(&quot;ndc.QAImp&quot;)
+
+	if not isNull(obj) then
+		arg = MakeNamedValue(&quot;submitForum&quot;,_
+						array(cateid, forumid, uname,_
+							  email, depart, subject, message, afile))
+		pySubmitForum() = obj.execute(array(arg))
+	endif
+	exit function
+err:
+	saveError(&quot;送出問題發生錯誤&quot;)
+end function
+
+REM *****
+REM **Bridge: 取得文章審核列表
+REM *****
+function pyGetQATopicStatusList(uname, depart, email)
+	dim obj, arg
+
+	On Local Error GoTo err
+	obj = createunoservice(&quot;ndc.QAImp&quot;)
+	if not isNull(obj) then
+		arg = MakeNamedValue(&quot;getQATopicStatusList&quot;, array(uname, depart, email))
+		pyGetQATopicStatusList() = obj.execute(array(arg))
+	endif
+	exit function
+err:
+	saveError(&quot;取得文章審核列表發生錯誤&quot;)
+end function
+
+REM *****
+REM **Bridge: QA 搜尋: 列表
+REM *****
+function pyGetQASearchList(keyword)
+	dim obj, arg
+
+	On Local Error GoTo err
+	obj = createunoservice(&quot;ndc.QAImp&quot;)
+	if not isNull(obj) then
+		arg = MakeNamedValue(&quot;getSearchList&quot;, array(keyword))
+		pyGetQASearchList() = obj.execute(array(arg))
+	endif
+	exit function
+err:
+	saveError(&quot;取得QA搜尋列表發生錯誤&quot;)
+end function
+
+REM *****
+REM **Bridge: QA: rest 新增使用者帳號
+REM *****
+function pyAddNewUser(username, partid, email)
+	dim obj, arg
+
+	On Local Error GoTo err
+	obj = createunoservice(&quot;ndc.QAImp&quot;)
+	if not isNull(obj) then
+		arg = MakeNamedValue(&quot;addNewUser&quot;, array(username, partid, email))
+		pyAddNewUser() = obj.execute(array(arg))
+	endif
+	exit function
+err:
+	saveError(&quot;新增 QA 使用者發生錯誤&quot;)
+end function
+
+REM *****
+REM **Bridge: QA: rest 使用者帳號是否存在
+REM *****
+function pyUserExist(username, partid, email)
+	dim obj, arg
+
+	On Local Error GoTo err
+	obj = createunoservice(&quot;ndc.QAImp&quot;)
+	if not isNull(obj) then
+		arg = MakeNamedValue(&quot;userExist&quot;, array(username, partid, email))
+		pyUserExist() = obj.execute(array(arg))
+	endif
+	exit function
+err:
+	saveError(&quot;檢查 QA 使用者發生錯誤&quot;)
+end function
+
+REM *****
+REM **Bridge: QA 紀錄 uid, mac address
+REM *****
+function pyLogQAUserMeta(uid)
+	dim obj, arg
+
+	On Local Error GoTo err
+	obj = createunoservice(&quot;ndc.QAImp&quot;)
+	if not isNull(obj) then
+		arg = MakeNamedValue(&quot;logUserMeta&quot;, uid)
+		pyLogQAUserMeta() = obj.execute(array(arg))
+	endif
+	exit function
+err:
+	saveError(&quot;新增 QA 使用者 - logmeta發生錯誤&quot;)
+end function
+
+REM *****
+REM **Bridge: hide UI
+REM *****
+function pyHideAllUI(doc, frame)
+	dim obj
+
+	obj = createunoservice(&quot;ndc.UtilsImp&quot;)
+	if not isNull(obj) then
+		obj.execute(array(MakeNamedValue(&quot;hideAllUI&quot;, frame)))
+	endif
+end function
+
+REM *****
+REM **Bridge: create/open doc
+REM *****
+function pyCreateNewDoc(optional loc, optional hidden)
+	dim argLoc, argHidden, arg
+	dim ret, obj
+
+	obj = createunoservice(&quot;ndc.UtilsImp&quot;)
+	argLoc = loc
+	argHidden = hidden
+	if isMissing(loc) then argLoc = &quot;private:factory/swriter&quot;
+	if isMissing(hidden) then argHidden = False
+
+	if not isNull(obj) then
+		arg = MakeNamedValue(&quot;createNewDoc&quot;, array(argLoc, argHidden))
+		pyCreateNewDoc() = obj.execute(array(arg))
+	endif
+end function
+
+REM *****
+REM **Bridge: create new pic object
+REM *****
+function pyCreateNewPicObj(picFileUrl, doc, cur, w, h)
+	dim obj, arg
+
+	obj = createunoservice(&quot;ndc.UtilsImp&quot;)
+	if not isNull(obj) then
+		arg = MakeNamedValue(&quot;createNewPicObj&quot;,_
+							  array(picFileUrl, doc, cur, doc.text, w, h))
+		obj.execute(array(arg))
+	endif
+end function
+
+REM *****
+REM **Bridge: get Windows version info string
+REM *****
+function pyGetWindowsVer() As String
+	dim obj, arg
+
+	On Local Error GoTo err
+	obj = createunoservice(&quot;ndc.UtilsImp&quot;)
+	if not isNull(obj) then
+		arg = MakeNamedValue(&quot;getWindowsVer&quot;, array())
+		pyGetWindowsVer() = obj.execute(array(arg))
+	EndIf
+	Exit Function
+err:
+	saveError(&quot;取得 Windows 版本資訊發生錯誤&quot;)
+end function
+
+</script:module>
