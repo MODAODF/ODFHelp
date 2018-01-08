@@ -74,23 +74,12 @@ function startUI(helpIndexData)
 	initDoc_qh = pyCreateNewDoc(, true)	 &apos; hidden doc used for py*(doc, ...)
 
 	dim tw, th, tx, ty  &apos; t=top window
-	tx = 100: ty = 200: tw = 1024: th = 670
+	tx = 100: ty = 200: tw = 524: th = 370
 
 	&apos; 外框
-    Window_qh = CreateTopWindow(tx, ty, tw, th)
+    Window_qh = CreateTopWindow(tx, ty, tw, th, &quot;ODF應用工具操作小幫手&quot;)
     Window_qh.setBackground(RGB(240, 240, 255))
 
-&apos;Dim oDlgModel, oDlg
-&apos;oDlgModel = CreateUnoService(&quot;com.sun.star.awt.UnoControlDialogModel&quot;)
-&apos;oDlg = CreateUnoService(&quot;com.sun.star.awt.UnoControlDialog&quot;)
-&apos;oDlg.setModel(oDlgModel)
-&apos;odlgModel.Width = tw
-&apos;odlgModel.Height = th
-&apos;odlgModel.title = &quot;dd&quot;
-&apos;oDlg.createPeer(CreateUnoService(&quot;com.sun.star.awt.Toolkit&quot;), null)
-&apos;odlg.execute()
-&apos;window_qh = odlg.peer
-If true Then
 	&apos; index 列表
 	mevt = CreateUnoListener(&quot;lboxqh_&quot;, XEnhancedMouseClickHandler)
 	parms = MakeListBoxCtrl(window_qh, mframe_qh, mevt, array(&quot;關鍵字數&quot;, &quot;文件列表&quot;))
@@ -115,7 +104,6 @@ If true Then
     findNextbtn_qh = MakeBtnCtl(Window_qh, &quot;﹀&quot;, &quot;findNext&quot;, calbak)
 
 	&apos; main frame for content window
-
 	MFrame_qh = createUnoService(&quot;com.sun.star.frame.Frame&quot;)
 	MFrame_qh.initialize(Window_qh)
 	&apos;MFrame_qh.setCreator(stardesktop)
@@ -128,17 +116,6 @@ If true Then
 
 	initContentWindow(window_qh, subwindow_qh, MFrame_qh)
 	twinqh_windowResized(window_qh.possize)  &apos; set size
-endif
-
-&apos;MFrame_qh = createUnoService(&quot;com.sun.star.frame.Frame&quot;)
-&apos;MFrame_qh.initialize(StarDesktop.ActiveFrame.ContainerWindow)
-&apos;MFrame_qh.setCreator(stardesktop)
-&apos;mframe_qh.Name = &quot;yyy&quot;
-&apos;mframe_qh.setComponent(window_qh, null)
-&apos;stardesktop.frames.append(mframe_qh)
-&apos; MFrame_qh.Title = &quot;uuu&quot;
-&apos; window_qh.setPosSize(tx,ty+500,tw,th,15)
-&apos; msgbox  MFrame_qh.Title
 end function
 
 

@@ -147,13 +147,6 @@ Sub AsyncCall_notify(doc)
 		pyCreateNewPicObj(picserials(idx), doc, cursor,_
 						  picsize.Width, picsize.Height)
 	Next
-
-&apos;Dim pointer
-&apos;pointer = createunoservice(&quot;com.sun.star.awt.Pointer&quot;)
-&apos;pointer.setType(com.sun.star.awt.SystemPointer.ARROW)
-&apos;window_qh.setPointer(pointer)
-&apos;subwindow_qh.setPointer(pointer)
-
 err:
 	helpContOpened = true
 end sub
@@ -164,14 +157,6 @@ REM **hide all docking window, set zoom value to fit to page(optima view)
 REM *****
 function loadDoc(Frame, doc, idx, ttype, extra)
 	dim contentUri
-
-&apos;Dim pointer
-&apos;pointer = createunoservice(&quot;com.sun.star.awt.Pointer&quot;)
-&apos;pointer.setType(com.sun.star.awt.SystemPointer.WAIT)
-&apos;window_qh.setPointer(pointer)
-&apos;subwindow_qh.setPointer(pointer)
-&apos;doclbox_qh.getCurrentController().getFrame().getContainerWindow().setPointer(pointer)
-&apos;listbox_qh.setPointer(pointer)
 
 	helpContOpened = false
 	contentUri = getHelpContentDocUri(idx, ttype, extra)

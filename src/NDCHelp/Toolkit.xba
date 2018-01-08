@@ -2,7 +2,20 @@
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
 <script:module xmlns:script="http://openoffice.org/2000/script" script:name="Toolkit" script:language="StarBasic">REM  *****  toolkits for window/dialog/frame/button creation  *****
 
-Function CreateTopWindow( x, y, w, h)
+Function CreateTopWindow( x, y, w, h, title )
+    Dim oDlgModel, oDlg
+    If getOS() &lt;&gt; &quot;UNIX&quot; Then
+	    oDlgModel = CreateUnoService(&quot;com.sun.star.awt.UnoControlDialogModel&quot;)
+	    oDlg = CreateUnoService(&quot;com.sun.star.awt.UnoControlDialog&quot;)
+	    oDlg.setModel(oDlgModel)
+	    odlgModel.Width = w
+	    odlgModel.Height = h
+	    odlgModel.title = title
+	    oDlg.createPeer(CreateUnoService(&quot;com.sun.star.awt.Toolkit&quot;), null)
+	    CreateTopWindow = oDlg.peer
+	    Exit Function
+	EndIf
+
    oAwtToolkit = CreateUnoService(&quot;com.sun.star.awt.Toolkit&quot;)
    oWindowDesc = CreateUnoStruct( &quot;com.sun.star.awt.WindowDescriptor&quot; )
    With oWindowDesc
@@ -12,7 +25,6 @@ Function CreateTopWindow( x, y, w, h)
 &apos;      .Type = com.sun.star.awt.WindowClass.SIMPLE
       .WindowServiceName = &quot;&quot;
       .ParentIndex = -1
-&apos;      .Parent = p
       .Bounds = MakeRectangle( x, y, w, h )
       
       .WindowAttributes = 0

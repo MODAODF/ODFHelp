@@ -36,7 +36,7 @@
               <value/>
             </prop>
             <prop oor:name="Title" oor:type="xs:string">
-              <value xml:lang="zh-TW">Q~A問題回報</value>
+              <value xml:lang="zh-TW">Q~&amp;A問題回報</value>
             </prop>
             <prop oor:name="URL" oor:type="xs:string">
               <value>vnd.sun.star.script:NDCHelp.OP.doQA?language=Basic&amp;location=application</value>
@@ -53,7 +53,7 @@
               <value/>
             </prop>
             <prop oor:name="Title" oor:type="xs:string">
-              <value xml:lang="zh-TW">QA問題狀態列~表</value>
+              <value xml:lang="zh-TW">Q&amp;A問題狀態列~表</value>
             </prop>
             <prop oor:name="URL" oor:type="xs:string">
               <value>vnd.sun.star.script:NDCHelp.OP.doStatusList?language=Basic&amp;location=application</value>
@@ -70,7 +70,7 @@
               <value/>
             </prop>
             <prop oor:name="Title" oor:type="xs:string">
-              <value xml:lang="zh-TW">QA搜~尋</value>
+              <value xml:lang="zh-TW">Q&amp;A搜~尋</value>
             </prop>
             <prop oor:name="URL" oor:type="xs:string">
               <value>vnd.sun.star.script:NDCHelp.OP.doSearchQA?language=Basic&amp;location=application</value>
@@ -87,7 +87,7 @@
               <value/>
             </prop>
             <prop oor:name="Title" oor:type="xs:string">
-              <value xml:lang="zh-TW">延伸套件(公務文件範~本)</value>
+              <value xml:lang="zh-TW">公務文件範~本</value>
             </prop>
             <prop oor:name="URL" oor:type="xs:string">
               <value>vnd.sun.star.script:NDCHelp.OP.doNDCCollection?language=Basic&amp;location=application</value>

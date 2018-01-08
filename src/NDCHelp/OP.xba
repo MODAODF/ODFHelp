@@ -72,7 +72,7 @@ function doSearchQA(optional keyword)
 	if not tryQALoginNewUser() Then Exit Function
 
 	If ismissing(keyword) Then  &apos; 主進入點: 詢問關鍵字
-		keyword = inputbox(&quot;輸入關鍵字&quot;)
+		keyword = inputbox(&quot;輸入關鍵字&quot;, &quot;QA 搜尋&quot;)
 	EndIf
 	If trim(keyword) = &quot;&quot; Then Exit Function
 

@@ -48,7 +48,8 @@ function findNextPrevKeyword(doc, amount as integer)
 	&apos; 檢查 amount 移動量有沒超出範圍
 	if findCurIdx + amount &gt;= 0 and findCurIdx + amount &lt; found.getCount() then
 		findCurIdx = findCurIdx + amount
-	endif
+	EndIf
+	if findCurIdx &lt; 0 then exit function
 
 	&apos; 還原查詢結果的顏色
 	for idx = 0 to found.getCount() - 1
@@ -133,7 +134,7 @@ REM **查詢關鍵字：查詢符合關鍵字的說明列表
 REM *****
 function queryFunc()
 	&apos; 沒輸入關鍵字則列全部
-	func_keyword = inputbox(&quot;輸入關鍵字&quot;, &quot;關鍵字查詢&quot;)
+	func_keyword = inputbox(&quot;輸入關鍵字&quot;, &quot;功能查詢&quot;)
 
 	prerow = nothing
 &apos;	on error resume next

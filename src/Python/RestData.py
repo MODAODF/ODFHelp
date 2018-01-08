@@ -236,7 +236,8 @@ class QAObj:
     #  @param uname str
     #  @param depart str
     #  @param email str
-    #  @return [str, str, int, int] [title, 已/未審核 title, topic_id, 已/未審核 id, timestamp]
+    #  @return [str, str, int, int]
+    #          [title, 已/未審核 title, topic_id, 已/未審核 id, timestamp]
     def getTopicStatusList(self, uname, depart, email):
         import uno
         uri = "/FluxBB/router/index.php/getdata/gettopicofuser/%s/%s/%s"

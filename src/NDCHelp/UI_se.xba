@@ -93,10 +93,10 @@ function startUI_se(datas, se_or_stlst As String)
 	initDoc_se = pyCreateNewDoc(, true)	 &apos; hidden doc used for py*(doc, ...)
 
 	dim tw, th, tx, ty  &apos; t=top window
-	tx = 100: ty = 200: tw = 1024: th = 670
+	tx = 100: ty = 200: tw = 524: th = 370
 
 	&apos; 外框
-    Window_se = CreateTopWindow(tx, ty, tw, th)
+    Window_se = CreateTopWindow(tx, ty, tw, th, &quot;ODF應用工具操作小幫手&quot;)
     Window_se.setBackground(RGB(240, 240, 255))
 
 	&apos; index 列表
