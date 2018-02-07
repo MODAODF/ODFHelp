@@ -40,7 +40,7 @@ Function tryQALoginNewUser()
 End Function
 
 REM *****
-REM **以部門代號查詢部門名稱
+REM **以部門代號or部門名稱查詢部門代號+部門名稱
 REM **查詢依據 ods 檔: https://data.gov.tw/dataset/7307 (行政院所屬中央及地方機關代碼)
 REM *****
 sub getPartNameById(e)
@@ -67,11 +67,20 @@ sub getPartNameById(e)
 		validate.state = false
 	Else
 		With found.celladdress
-			If .column &lt;&gt; 0 Then
-				ret = &quot;請輸入代碼&quot;
+			If .column &lt;&gt; 0 And .column &lt;&gt; 1 Then
+				ret = &quot;請輸入代碼或機關全銜&quot;
 				validate.state = false
 			Else
-				ret = sheet.getCellByPosition(.column+1, .row).String
+				&apos; mts 1127：列部門代號+部門名稱
+				If .column = 0 Then  &apos; 輸入部門代號
+					ret = sheet.getCellByPosition(.column, .row).String + &quot;|&quot; + _
+						    sheet.getCellByPosition(.column+1, .row).String
+				ElseIf .column = 1 Then  &apos; 輸入部門名稱
+					ret = sheet.getCellByPosition(.column - 1, .row).String + &quot;|&quot; + _
+						    sheet.getCellByPosition(.column, .row).String
+					dlg.getControl(&quot;partid&quot;).Text = _
+							sheet.getCellByPosition(.column - 1, .row).String
+				EndIf
 				validate.state = true
 			EndIf
 		end With
@@ -111,6 +120,7 @@ Function save2UserConfig(username, partid, email)
 	sfa = CreateUnoService(SimpleFileAccess)
 	ostream = sfa.openFileWrite(userDataFileUrl())
 	tstream = CreateUnoService(TextOutputStream)
+	ostream.truncate()
 	tstream.setEncoding(&quot;UTF-8&quot;)
 	tstream.setOutputStream(ostream)
 	tstream.writeString(buf)
@@ -127,12 +137,12 @@ Sub validateQALogin(e)
 	username = trim(dlg.getControl(&quot;username&quot;).Text)
 	partid = trim(dlg.getControl(&quot;partid&quot;).Text)
 	email = trim(dlg.getControl(&quot;email&quot;).Text)
-	If username = &quot;&quot; Or partid = &quot;&quot; Or email = &quot;&quot; Then
-		msgbox &quot;所有欄位為必填&quot;
+	If username = &quot;&quot; Or partid = &quot;&quot; Or email = &quot;&quot; Then 
+		msgbox(&quot;所有欄位為必填&quot;, 1,"Q&amp;A問題回報註冊")
 		Exit Sub
 	EndIf
 	If dlg.getControl(&quot;OptionButton1&quot;).Model.State = false Then
-		msgbox &quot;單位代碼驗證失敗&quot;
+		msgbox(&quot;單位代碼驗證失敗&quot;, 1,"Q&amp;A問題回報註冊")
 		Exit Sub
 	EndIf
 	dlg.endDialog(1)
@@ -146,30 +156,39 @@ REM **2) log uid, mac address to server
 REM **3) rest sql insert
 REM *****
 Function setUserDataFromDlg()
-	Dim ret, dlg, username, partid, email, uid, user
+	Dim ret, dlg, username, partid, email, uid, user, calbak
 
 	dlg = createunodialog(DialogLibraries.NDCHelp.QALogin)
-	ret = dlg.execute()
-	If ret = 0 Then Exit Function
+	calbak = CreateUnoListener(&quot;dlg_&quot;, XTopWindowListener)
+	dlg.peer.addTopWindowListener(calbak)
+
+	ret = 0
+	While ret = 0
+		ret = dlg.execute()
+		If ret = IDCANCEL Then Exit Function  &apos; Esc or (X)
+	Wend
 
 	username = trim(dlg.getControl(&quot;username&quot;).Text)
 	partid = trim(dlg.getControl(&quot;partid&quot;).Text)
 	email = trim(dlg.getControl(&quot;email&quot;).Text)
 
+	save2UserConfig(&quot;&quot;, &quot;&quot;, &quot;&quot;)  &apos; truncate
+
 	&apos; 檢查使用者帳號.
+	On Local Error GoTo err
 	user = pyUserExist(username, partid, email)
 	If ubound(user) &gt; 0 Then uid = user(1)
 
 	If user(0) = &quot;email&quot; Then
-		msgbox &quot;該email已註冊，請使用其他email&quot;
+		msgbox(&quot;該email已註冊，請使用其他email&quot;, 1,"Q&amp;A問題回報註冊")
 		Exit Function
 	EndIf
 	If user(0) = &quot;namedepart&quot; Then
-		msgbox &quot;該單位使用者已註冊，請使用其他名稱&quot;
+		msgbox(&quot;該單位使用者已註冊，請使用其他名稱&quot;, 1,"Q&amp;A問題回報註冊") 
 		Exit Function
 	EndIf
 	If user(0) = &quot;all&quot; And uid &gt; 0 Then  &apos; 已有該帳號：顯示警告訊息
-		msgbox &quot;歡迎回來繼續使用QA問題回報程式，您可繼續查詢先前提問的記錄。&quot;
+		msgbox(&quot;歡迎回來繼續使用Q&amp;A問題回報程式，您可繼續查詢先前提問的記錄。&quot;,,"Q&amp;A問題回報註冊")
 		ret = pylogQAUserMeta(uid)
 		If ret Then
 			save2UserConfig(username, partid, email)
@@ -188,8 +207,10 @@ Function setUserDataFromDlg()
 		EndIf
 	EndIf
 &apos;	Else
-		msgbox &quot;伺服器連線失敗! 無法更新使用者資訊&quot;
+		msgbox(&quot;伺服器連線失敗! 無法更新使用者資訊&quot;, 1,"Q&amp;A問題回報註冊")
 &apos;	EndIf
+	exit function
+err:
 End Function
 
 REM *****
@@ -200,6 +221,35 @@ Sub partid_updated(e)
 
 	if e.source.Text &lt;&gt; &quot;&quot; Then enabled = true
 	e.Source.context.getControl(&quot;CommandButton2&quot;).model.enabled = enabled
+End Sub
+
+Sub dlg_disposing(e)
+End Sub
+Sub dlg_windowOpened(e)
+End Sub
+REM *****
+REM **Esc or (X)
+REM *****
+Function dlg_windowClosing(e)
+	Dim ret
+
+	ret = msgbox(&quot;確定要取消此畫面？確認後原有的帳號仍會保留在本電腦中。&quot;,_
+				  MB_YESNO + MB_DEFBUTTON1 + MB_ICONQUESTION,"Q&amp;A問題回報註冊")
+	If ret = IDYES then
+		e.Source.endDialog(IDCANCEL)
+	Else
+		e.Source.endDialog(0)
+	EndIf
+End Function
+Function dlg_windowClosed(e)
+End Function
+Sub dlg_windowMinimized(e)
+End Sub
+Sub dlg_windowNormalized(e)
+End Sub
+Sub dlg_windowActivated(e)
+End Sub
+Sub dlg_windowDeactivated(e)
 End Sub
 
 </script:module>

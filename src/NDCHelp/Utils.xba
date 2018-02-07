@@ -84,7 +84,6 @@ REM **取得 .config 路徑
 REM *****
 function getUserConfigPathUrl()
 	Dim PathSettings AS Object
-
 	PathSettings = CreateUnoservice(&quot;com.sun.star.util.PathSettings&quot;)
 	getUserConfigPathUrl() = pathsettings.UserConfig
 end function
@@ -100,7 +99,10 @@ REM *****
 REM **取得 errorlog file 路徑
 REM *****
 Function errFileUrl()
-	errFileUrl = getModulePath() &amp; &quot;/err.log&quot;
+	Dim PathSettings AS Object
+	PathSettings = CreateUnoservice(&quot;com.sun.star.util.PathSettings&quot;)
+	getUserConfigPathUrl() = pathsettings.UserConfig
+	errFileUrl = getUserConfigPathUrl() &amp; &quot;/err.log&quot;
 End Function
 
 REM *****

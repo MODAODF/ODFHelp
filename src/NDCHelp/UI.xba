@@ -69,12 +69,14 @@ function startUI(helpIndexData)
 	doc_qh = nothing  &apos; 給預設值避免第二次以後執行，關鍵字查詢會出錯的情況發生
 	doclbox_qh = nothing
 	prerow = nothing
+
 	func_keyword = &quot;&quot;
 	presearch_keyword = &quot;&quot;
 	initDoc_qh = pyCreateNewDoc(, true)	 &apos; hidden doc used for py*(doc, ...)
 
 	dim tw, th, tx, ty  &apos; t=top window
-	tx = 100: ty = 200: tw = 524: th = 370
+	tx = (ScreenSize.Width+1)*0.35: ty = (ScreenSize.Height+1)*0.35: _ 
+	tw = (ScreenSize.Width+1)*0.3: th = (ScreenSize.Height+1)*0.3
 
 	&apos; 外框
     Window_qh = CreateTopWindow(tx, ty, tw, th, &quot;ODF應用工具操作小幫手&quot;)
@@ -90,9 +92,9 @@ function startUI(helpIndexData)
 	calbak = CreateUnoListener(&quot;actqh_&quot;, XActionListener)
     closebtn_qh = MakeBtnCtl(Window_qh, &quot;關閉&quot;, &quot;close&quot;, calbak)
 	&apos; 縮小
-    resizeSbtn_qh = MakeBtnCtl(Window_qh, &quot;-&quot;, &quot;resizeS&quot;, calbak)
+    resizeSbtn_qh = MakeBtnCtl(Window_qh, &quot;縮小&quot;, &quot;resizeS&quot;, calbak)
 	&apos; 放大
-    resizeMbtn_qh = MakeBtnCtl(Window_qh, &quot;+&quot;, &quot;resizeM&quot;, calbak)
+    resizeMbtn_qh = MakeBtnCtl(Window_qh, &quot;放大&quot;, &quot;resizeM&quot;, calbak)
 	&apos; 功能查詢
     queryFuncBtn_qh = MakeBtnCtl(Window_qh, &quot;功能查詢&quot;, &quot;queryFunc&quot;, calbak)
 	&apos; 關鍵字查詢

@@ -113,12 +113,12 @@ function queryKeyword(doc)
 	if dlg.getControl(&quot;OptionButton1&quot;).State then  &apos; 單一文件查詢
 		&apos; 沒開啟說明文件就查詢
 		if isNull(doc) or isEmpty(doc) then
-			msgbox &quot;請先開啟說明&quot;
+			msgbox(&quot;請先開啟說明&quot;, 1,"關鍵字查詢")
 			exit function
 		endif
 		searchDoc(doc, presearch_keyword, true)  &apos; 還原前次查詢結果的顏色
 		if searchDoc(doc, keyword, false) = 0 then
-			msgbox &quot;查無結果&quot;
+			msgbox(&quot;查無結果&quot;, 1,"關鍵字查詢")
 		endif
 	ElseIf dlg.getControl(&quot;OptionButton2&quot;).State Then &apos; 全域查詢
 		searchGlobal(keyword)

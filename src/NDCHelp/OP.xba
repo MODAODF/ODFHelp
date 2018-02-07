@@ -14,7 +14,11 @@ function doNDCCollection()
 	Basicc.Module2.Main
 	exit function
 ndcnotfound:
-	msgbox &quot;請先安裝延伸套件(公務文件範本)!&quot;
+REM **msgbox &quot;請先安裝延伸套件(公務文件範本)!&quot;
+	dim document   as object
+	dim dispatcher as object
+	dispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+	dispatcher.executeDispatch(Stardesktop, &quot;.uno:NewDoc&quot;, &quot;&quot;, 0, Array())
 end function
 
 REM *****
@@ -72,7 +76,7 @@ function doSearchQA(optional keyword)
 	if not tryQALoginNewUser() Then Exit Function
 
 	If ismissing(keyword) Then  &apos; 主進入點: 詢問關鍵字
-		keyword = inputbox(&quot;輸入關鍵字&quot;, &quot;QA 搜尋&quot;)
+		keyword = inputbox(&quot;輸入要查詢的關鍵字，搜尋範圍為所有透過Q&amp;A問題回報機制詢問並回覆的內容。&quot;, &quot;Q&amp;A搜尋&quot;)
 	EndIf
 	If trim(keyword) = &quot;&quot; Then Exit Function
 
@@ -80,7 +84,7 @@ function doSearchQA(optional keyword)
 
 	On Local Error GoTo err
 	If ubound(searchdatas) = -1 Then
-		msgbox &quot;查詢無結果&quot;
+		msgbox(&quot;查詢無結果&quot;, 1,"Q&amp;A搜尋")
 		Exit function
 	EndIf
 
@@ -88,6 +92,22 @@ function doSearchQA(optional keyword)
 	startUI_se(searchdatas, &quot;se&quot;)  &apos; 才開啟搜尋結果視窗
 err:
 end function
+
+REM *****
+REM **main op: 重新註冊帳號
+REM *****
+function doRelogin()
+	Dim ret, msg
+
+	init()
+	msg = &quot;&quot;
+	msg = msg &amp; &quot;此動作會重新在本台電腦註冊一個新的Q&amp;A帳戶，&quot;
+	msg = msg &amp; &quot;若帳戶己經存在，則會重新登入，原帳號詢問的問題在本機端會自動刪除，您確認要繼續執行嗎？&quot;
+	ret = msgbox(msg, 1,"重新註冊Q&amp;A帳號")
+	if ret &lt;&gt; 1 then exit function
+
+	setUserDataFromDlg()
+End Function
 
 REM *****
 REM **QA 問題回報: 送出問題
@@ -107,11 +127,11 @@ function onQASubmit(e)
 
 	if uname = &quot;&quot; or depart = &quot;&quot; or email = &quot;&quot; or _
 		subject = &quot;&quot; or message = &quot;&quot; or selForumIdx = -1 Then
-		msgbox &quot;所有欄位必填&quot;
+		msgbox(&quot;所有欄位必填&quot;, 1,"Q&amp;A問題回報")
 		exit function
 	endif
 
-	ret = msgbox(&quot;確認送出？&quot;, 4)
+	ret = msgbox(&quot;確認送出？&quot;, 4,"重新註冊Q&amp;A帳號")
 	if ret = 7 then exit function
 
 	dlg.endExecute()
@@ -123,11 +143,21 @@ function onQASubmit(e)
 	ret = pySubmitForum(selCateIdx, selForumIdx, uname, email,_
 						depart, subject, message, afile)
 	if ret then
-		msgbox &quot;已送出回報問題&quot;
+		msgbox(&quot;已送出回報問題&quot;, 1,"Q&amp;A問題回報")
 	else
-		msgbox &quot;送出回報問題失敗&quot;
+		msgbox(&quot;送出回報問題失敗&quot;, 1,"Q&amp;A問題回報")
 	EndIf
 end function
+
+REM *****
+REM **登出
+REM *****
+Sub onQALogout(e)
+	If msgbox(&quot;確定登出?&quot;, MB_YESNO + MB_DEFBUTTON2 + MB_ICONQUESTION,"Q&amp;A問題回報") = IDYES Then
+		save2UserConfig(&quot;&quot;, &quot;&quot;, &quot;&quot;)  &apos; truncate
+		e.Source.Context.endDialog(0)
+	EndIf
+End Sub
 
 REM *****
 REM **選取分類一: 列表分類二

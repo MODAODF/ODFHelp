@@ -93,10 +93,11 @@ function startUI_se(datas, se_or_stlst As String)
 	initDoc_se = pyCreateNewDoc(, true)	 &apos; hidden doc used for py*(doc, ...)
 
 	dim tw, th, tx, ty  &apos; t=top window
-	tx = 100: ty = 200: tw = 524: th = 370
+	tx = (ScreenSize.Width+1)*0.35: ty = (ScreenSize.Height+1)*0.35: _ 
+	tw = (ScreenSize.Width+1)*0.3: th = (ScreenSize.Height+1)*0.3
 
 	&apos; 外框
-    Window_se = CreateTopWindow(tx, ty, tw, th, &quot;ODF應用工具操作小幫手&quot;)
+    Window_se = CreateTopWindow(tx, ty, tw, th, &quot;Q&amp;A問題回應列表&quot;)
     Window_se.setBackground(RGB(240, 240, 255))
 
 	&apos; index 列表
@@ -261,7 +262,7 @@ Sub twinse_windowResized(e)
 			.getColumns.getByIndex(1).width = w - w / 10
 		end With
 	EndIf
-	If is_se_or_stlst = &quot;stlst&quot; Then  &apos; 問題狀態列表
+	If is_se_or_stlst = &quot;stlst&quot; Then  &apos; 問題回應列表
 		with doclbox_se.sheets.getByIndex(0)
 			.getColumns.getByIndex(0).width = w / 10
 			.getColumns.getByIndex(1).width = w / 15

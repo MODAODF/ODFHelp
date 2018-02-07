@@ -19,7 +19,7 @@
               <value/>
             </prop>
             <prop oor:name="Title" oor:type="xs:string">
-              <value xml:lang="zh-TW">操作小幫~手</value>
+              <value xml:lang="zh-TW">操作小幫手(~H)</value>
             </prop>
             <prop oor:name="URL" oor:type="xs:string">
               <value>vnd.sun.star.script:NDCHelp.OP.doHelp?language=Basic&amp;location=application</value>
@@ -36,7 +36,7 @@
               <value/>
             </prop>
             <prop oor:name="Title" oor:type="xs:string">
-              <value xml:lang="zh-TW">Q~&amp;A問題回報</value>
+              <value xml:lang="zh-TW">Q&amp;A問題回報(~Q)</value>
             </prop>
             <prop oor:name="URL" oor:type="xs:string">
               <value>vnd.sun.star.script:NDCHelp.OP.doQA?language=Basic&amp;location=application</value>
@@ -53,7 +53,7 @@
               <value/>
             </prop>
             <prop oor:name="Title" oor:type="xs:string">
-              <value xml:lang="zh-TW">Q&amp;A問題狀態列~表</value>
+              <value xml:lang="zh-TW">Q&amp;A問題回應列表(~L)</value>
             </prop>
             <prop oor:name="URL" oor:type="xs:string">
               <value>vnd.sun.star.script:NDCHelp.OP.doStatusList?language=Basic&amp;location=application</value>
@@ -70,7 +70,7 @@
               <value/>
             </prop>
             <prop oor:name="Title" oor:type="xs:string">
-              <value xml:lang="zh-TW">Q&amp;A搜~尋</value>
+              <value xml:lang="zh-TW">Q&amp;A搜尋(~S)</value>
             </prop>
             <prop oor:name="URL" oor:type="xs:string">
               <value>vnd.sun.star.script:NDCHelp.OP.doSearchQA?language=Basic&amp;location=application</value>
@@ -87,10 +87,27 @@
               <value/>
             </prop>
             <prop oor:name="Title" oor:type="xs:string">
-              <value xml:lang="zh-TW">公務文件範~本</value>
+              <value xml:lang="zh-TW">公務文件範本(~T)</value>
             </prop>
             <prop oor:name="URL" oor:type="xs:string">
               <value>vnd.sun.star.script:NDCHelp.OP.doNDCCollection?language=Basic&amp;location=application</value>
+            </prop>
+            <prop oor:name="Target" oor:type="xs:string">
+              <value>_self</value>
+            </prop>
+            <prop oor:name="ImageIdentifier" oor:type="xs:string">
+              <value/>
+            </prop>
+          </node>
+          <node oor:name="menu06" oor:op="replace">
+            <prop oor:name="Context" oor:type="xs:string">
+              <value/>
+            </prop>
+            <prop oor:name="Title" oor:type="xs:string">
+              <value xml:lang="zh-TW">重新註冊Q&amp;A帳號(~R)</value>
+            </prop>
+            <prop oor:name="URL" oor:type="xs:string">
+              <value>vnd.sun.star.script:NDCHelp.OP.doRelogin?language=Basic&amp;location=application</value>
             </prop>
             <prop oor:name="Target" oor:type="xs:string">
               <value>_self</value>

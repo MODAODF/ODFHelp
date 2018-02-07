@@ -146,7 +146,7 @@ function pyGetQASearchList(keyword)
 	endif
 	exit function
 err:
-	saveError(&quot;取得QA搜尋列表發生錯誤&quot;)
+	saveError(&quot;取得Q&amp;A搜尋列表發生錯誤&quot;)
 end function
 
 REM *****

@@ -121,4 +121,13 @@ Function MakeRectangle( ByVal nX As Long, ByVal nY As Long,_
    End With
    MakeRectangle() = oRectangle
 End Function
+
+REM *****
+REM **ScreenSize
+REM *****
+Function ScreenSize()
+	oAwtToolkit = CreateUnoService(&quot;com.sun.star.awt.Toolkit&quot;)
+	aWorkRect = oAwtToolkit.getWorkArea()
+	ScreenSize() = aWorkRect
+End Function
 </script:module>
