@@ -15,8 +15,10 @@ IMAGEDIR = 'conpics'  # 圖檔目錄
 
 HELP_HOST = '223.200.166.56'  # rest host
 QA_HOST = '223.200.166.57'  # rest host
-#QA_HOST = '192.168.1.60'  # rest host
 
+USETAGS = 1
+aQA_HOST = 'odf.nat.gov.tw'  # rest host test
+aQA_PATH = '/QA/web/' #rest path
 
 ## Switch to http connection(REST) or zipfile
 #
@@ -54,16 +56,39 @@ class TwowayConnector(object):
             self.__conn_z_open(modpath)
             helplist = list()
             for info in self.__conn.infolist():
-                helplist.append({'title': info.filename})
+                if USETAGS:
+                    title = info.filename.split(":")
+                    helplist.append({'title': title[0]})
+                else:
+                    helplist.append({'title': info.filename})
 
             return helplist
+
+    ## gettags
+    #  @see HelpObj
+    #  @param idx int
+    #  @param modpath str module path
+    def getTags(self, idx, modpath=''):
+        #~ if self.__kind == 'h':
+            #~ self.__conn.request('GET', '/getCategory')
+            #~ response = self.__conn.getresponse()
+            #~ jdatas = json.loads(response.read().decode())['aaData']
+            #~ return jdatas
+        #~ elif self.__kind == 'z':
+        if self.__kind == 'z':
+            self.__conn_z_open(modpath)
+            helptags = list()
+            for info in self.__conn.infolist():
+                title = info.filename.split(":")
+                helptags.append({'tags': title[1]})
+            return helptags
 
     ## getcontent
     #  @see HelpObj
     #  @param idx int
     #  @param keyword str
     #  @param modpath str module path
-    def getContent(self, idx, keyword, modpath=''):
+    def getContent(self, idx, keyword, modpath=''): 
         if self.__kind == 'h':
             self.__conn.request('GET', '/getArticle/' +
                                  self.getIndex(idx, keyword))
@@ -77,15 +102,28 @@ class TwowayConnector(object):
 
             buf = list()
             # 沒設關鍵字列全部
-            data = TwowayConnector.getIndex(self, idx, modpath)
+            data_titie = TwowayConnector.getIndex(self, idx, modpath)
             if keyword != '':
-                data = list()
-                for buf in TwowayConnector.getIndex(self, idx, modpath):
-                    if buf['title'].find(keyword) > -1:  # 有關鍵字
-                        data.append(buf)
+                data_titie = list()
+                data_tag = list()
+                jdatas = TwowayConnector.getIndex(self, idx, modpath)
+                tdatas = TwowayConnector.getTags(self, idx, modpath)
+                
+                for jdata,tdata in zip(jdatas,tdatas):  
+                        if tdata['tags'].find(keyword) > -1:
+                            data_titie.append(jdata)
+                            data_tag.append(tdata)
+            else:
+                data_titie = list()
+                for info in self.__conn.infolist():
+                    data_titie.append({'title': info.filename})
 
-            data = data[idx]
-            filename = data['title']
+            data_titie = data_titie[idx]
+            filename = data_titie['title']
+            if keyword != '':
+                data_tag = data_tag[idx]
+                filename += ":"
+                filename += data_tag['tags']
             return self.__conn.read(filename).decode('utf8')
 
 
@@ -100,15 +138,25 @@ class HelpObj(TwowayConnector):
     #  @param keyword str 關鍵字：有符合才列
     #  @return idx/[title,...] int/list(str,...) index/titles
     def getIndex(self, idx=None, keyword='', modpath=''):
+
         jdatas = TwowayConnector.getIndex(self, idx, modpath)
+        tdatas = TwowayConnector.getTags(self, idx, modpath)
 
         realindex = []
-        for data in jdatas:  # 為了過濾 title, 必需先建立真正的列表...
-            if data['title'] != 'Untitled':  # 好讓 listbox 對應到真正的 index
+        for jdata,tdata in zip(jdatas,tdatas):  # 為了過濾 title, 必需先建立真正的列表...
+            if jdata['title'] != 'Untitled':  # 好讓 listbox 對應到真正的 index
                 if keyword == '':  # 沒設關鍵字列全部
-                    realindex.append(data)
-                elif data['title'].find(keyword) > -1:  # 有關鍵字
-                    realindex.append(data)
+                    realindex.append(jdata)
+                elif tdata['tags'].find(keyword) > -1:  # 有關鍵字
+                    realindex.append(jdata)
+        
+        #~ realindex = []
+        #~ for data in jdatas:  # 為了過濾 title, 必需先建立真正的列表...
+            #~ if data['title'] != 'Untitled':  # 好讓 listbox 對應到真正的 index
+                #~ if keyword == '':  # 沒設關鍵字列全部
+                    #~ realindex.append(data)
+                #~ elif data['title'].find(keyword) > -1:  # 有關鍵字
+                    #~ realindex.append(data)
 
         if idx is None:  # 列表
             idxs = []
@@ -127,6 +175,34 @@ class HelpObj(TwowayConnector):
     #  @return str content
     def getContent(self, idx, keyword, modpath=''):
         return TwowayConnector.getContent(self, idx, keyword, modpath)
+
+    ## 說明內容
+    #  @param idx int index
+    #  @param keyword str 關鍵字 for getTags()
+    #  @return str tags
+    def getTags(self, idx, keyword='', modpath=''):
+        jdatas = TwowayConnector.getIndex(self, idx, modpath)
+
+        realindex = []
+        for data in jdatas:  # 為了過濾 title, 必需先建立真正的列表...
+            if data['title'] != 'Untitled':  # 好讓 listbox 對應到真正的 index
+                if keyword == '':  # 沒設關鍵字列全部
+                    realindex.append(data)
+                elif data['title'].find(keyword) > -1:  # 有關鍵字
+                    realindex.append(data)
+        tags = []
+        for data in realindex:
+            tags.append(data['tags'])
+        return tags[idx]
+
+    ##  get real img idx
+    def getImgIndex(self, idx=None, title='', modpath=''):
+        jdatas = TwowayConnector.getIndex(self, idx, modpath)
+        ridx = 0
+        for ridx, data in enumerate(jdatas):
+            if data['title'].find(title) > -1:
+                break
+        return ridx
 
 
 ## Object for request restful data:QA
@@ -345,6 +421,20 @@ class QAObj:
         response = self.__conn.getresponse()
         return response.status == 200
 
+## web browser (Default browser)
+#  @param url object
+import webbrowser
+
+def UseWebBrowser(webfilename):
+	try:
+		oURL = "http://" + aQA_HOST + aQA_PATH + webfilename
+		if webbrowser.open(oURL,new=1,autoraise=1)== False:		# false is error
+			raise webbrowser.Error
+		oDisp = 'Success'
+	except webbrowser.Error:
+		oDisp = str(sys.stderr) + ' open failed'
+	except:
+		oDisp = traceback.format_exc(sys.exc_info()[2])
 
 if __name__ != '__main__':
     ## Bridge to call via Basic.createUnoService("...")
@@ -386,6 +476,9 @@ if __name__ != '__main__':
                     return QAObj().userExist(username, partid, email)
                 if prop.Name == 'logUserMeta':
                     return QAObj().logUserMeta(prop.Value)
+                if prop.Name == 'UseWebBrowser':
+                    UseWebBrowser(webfilename=prop.Value)
+                    return
 
     g_ImplementationHelper = unohelper.ImplementationHelper()
     g_ImplementationHelper.addImplementation(QAImp,

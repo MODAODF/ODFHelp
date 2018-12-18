@@ -32,81 +32,86 @@ REM *****
 REM **main op: 審核列表
 REM *****
 function doStatusList()
-	Dim datas
+REM	Dim datas
 
-	init()
-	if not tryQALoginNewUser() Then Exit Function
-	datas = pyGetQATopicStatusList(QAUserData(&quot;username&quot;),_
-								   QAUserData(&quot;partid&quot;),_
-								   QAUserData(&quot;email&quot;))
-	startUI_se(datas, &quot;stlst&quot;)
+REM	init()
+REM	if not tryQALoginNewUser() Then Exit Function
+REM	datas = pyGetQATopicStatusList(QAUserData(&quot;username&quot;),_
+REM								   QAUserData(&quot;partid&quot;),_
+REM								   QAUserData(&quot;email&quot;))
+REM	startUI_se(datas, &quot;stlst&quot;)
+    pyUseWebBrowser(&quot;qa_list.html&quot;)
 end function
 
 REM *****
 REM **main op: QA 問題回報 dialog
 REM *****
 function doQA()
-	dim dlg, data
 
-	init()
+REM	dim dlg, data
 
-	if not tryQALoginNewUser() Then Exit Function
+REM	init()
 
-	selCateIdx = -1: selForumIdx = -1
-	dlg = createunodialog(DialogLibraries.NDCHelp.QA)
+REM	if not tryQALoginNewUser() Then Exit Function
 
-	dlg.getControl(&quot;username&quot;).Text = QAUserData(&quot;username&quot;)
-	dlg.getControl(&quot;partid&quot;).Text = QAUserData(&quot;partid&quot;)
-	dlg.getControl(&quot;email&quot;).Text = QAUserData(&quot;email&quot;)
+REM	selCateIdx = -1: selForumIdx = -1
+REM	dlg = createunodialog(DialogLibraries.NDCHelp.QA)
 
-	on error resume next
-    dlg.getControl(&quot;ComboBox1&quot;).model.stringItemList = pyGetQACateList()
-	on error goto 0
+REM	dlg.getControl(&quot;username&quot;).Text = QAUserData(&quot;username&quot;)
+REM	dlg.getControl(&quot;partid&quot;).Text = QAUserData(&quot;partid&quot;)
+REM	dlg.getControl(&quot;email&quot;).Text = QAUserData(&quot;email&quot;)
 
-	dlg.execute()
+REM	on error resume next
+REM   dlg.getControl(&quot;ComboBox1&quot;).model.stringItemList = pyGetQACateList()
+REM	on error goto 0
+
+REM	dlg.execute()
+    pyUseWebBrowser(&quot;qa_signup.html&quot;)
 end function
 
 REM *****
 REM **main op: 搜尋 QA
 REM *****
 function doSearchQA(optional keyword)
-	Dim searchdatas
+REM	Dim searchdatas
 
-	init()
-	if not tryQALoginNewUser() Then Exit Function
+REM	init()
+REM	if not tryQALoginNewUser() Then Exit Function
 
-	If ismissing(keyword) Then  &apos; 主進入點: 詢問關鍵字
-		keyword = inputbox(&quot;輸入要查詢的關鍵字，搜尋範圍為所有透過Q&amp;A問題回報機制詢問並回覆的內容。&quot;, &quot;Q&amp;A搜尋&quot;)
-	EndIf
-	If trim(keyword) = &quot;&quot; Then Exit Function
+REM	If ismissing(keyword) Then  &apos; 主進入點: 詢問關鍵字
+REM		keyword = inputbox(&quot;輸入要查詢的關鍵字，搜尋範圍為所有透過Q&amp;A問題回報機制詢問並回覆的內容。&quot;, &quot;Q&amp;A搜尋&quot;)
+REM	EndIf
+REM	If trim(keyword) = &quot;&quot; Then Exit Function
 
-	searchdatas = pyGetQASearchList(keyword)
+REM	searchdatas = pyGetQASearchList(keyword)
 
-	On Local Error GoTo err
-	If ubound(searchdatas) = -1 Then
-		msgbox(&quot;查詢無結果&quot;, 1,"Q&amp;A搜尋")
-		Exit function
-	EndIf
+REM	On Local Error GoTo err
+REM	If ubound(searchdatas) = -1 Then
+REM		msgbox(&quot;查詢無結果&quot;, 1,&quot;Q&amp;A搜尋&quot;)
+REM		Exit function
+REM	EndIf
 
-	actClose_qh(nothing)  &apos; 從其他功能進來：關閉自己的視窗
-	startUI_se(searchdatas, &quot;se&quot;)  &apos; 才開啟搜尋結果視窗
-err:
+REM	actClose_qh(nothing)  &apos; 從其他功能進來：關閉自己的視窗
+REM	startUI_se(searchdatas, &quot;se&quot;)  &apos; 才開啟搜尋結果視窗
+REM err:
+    pyUseWebBrowser(&quot;qa_index.html&quot;)
 end function
 
 REM *****
 REM **main op: 重新註冊帳號
 REM *****
 function doRelogin()
-	Dim ret, msg
+REM	Dim ret, msg
 
-	init()
-	msg = &quot;&quot;
-	msg = msg &amp; &quot;此動作會重新在本台電腦註冊一個新的Q&amp;A帳戶，&quot;
-	msg = msg &amp; &quot;若帳戶己經存在，則會重新登入，原帳號詢問的問題在本機端會自動刪除，您確認要繼續執行嗎？&quot;
-	ret = msgbox(msg, 1,"重新註冊Q&amp;A帳號")
-	if ret &lt;&gt; 1 then exit function
+REM	init()
+REM	msg = &quot;&quot;
+REM	msg = msg &amp; &quot;此動作會重新在本台電腦註冊一個新的Q&amp;A帳戶，&quot;
+REM	msg = msg &amp; &quot;若帳戶己經存在，則會重新登入，原帳號詢問的問題在本機端會自動刪除，您確認要繼續執行嗎？&quot;
+REM	ret = msgbox(msg, 1,&quot;重新註冊Q&amp;A帳號&quot;)
+REM	if ret &lt;&gt; 1 then exit function
 
-	setUserDataFromDlg()
+REM	setUserDataFromDlg()
+    pyUseWebBrowser(&quot;qa_resignup.html&quot;)
 End Function
 
 REM *****
@@ -127,11 +132,11 @@ function onQASubmit(e)
 
 	if uname = &quot;&quot; or depart = &quot;&quot; or email = &quot;&quot; or _
 		subject = &quot;&quot; or message = &quot;&quot; or selForumIdx = -1 Then
-		msgbox(&quot;所有欄位必填&quot;, 1,"Q&amp;A問題回報")
+		msgbox(&quot;所有欄位必填&quot;, 1,&quot;Q&amp;A問題回報&quot;)
 		exit function
 	endif
 
-	ret = msgbox(&quot;確認送出？&quot;, 4,"重新註冊Q&amp;A帳號")
+	ret = msgbox(&quot;確認送出？&quot;, 4,&quot;重新註冊Q&amp;A帳號&quot;)
 	if ret = 7 then exit function
 
 	dlg.endExecute()
@@ -143,9 +148,9 @@ function onQASubmit(e)
 	ret = pySubmitForum(selCateIdx, selForumIdx, uname, email,_
 						depart, subject, message, afile)
 	if ret then
-		msgbox(&quot;已送出回報問題&quot;, 1,"Q&amp;A問題回報")
+		msgbox(&quot;已送出回報問題&quot;, 1,&quot;Q&amp;A問題回報&quot;)
 	else
-		msgbox(&quot;送出回報問題失敗&quot;, 1,"Q&amp;A問題回報")
+		msgbox(&quot;送出回報問題失敗&quot;, 1,&quot;Q&amp;A問題回報&quot;)
 	EndIf
 end function
 
@@ -153,7 +158,7 @@ REM *****
 REM **登出
 REM *****
 Sub onQALogout(e)
-	If msgbox(&quot;確定登出?&quot;, MB_YESNO + MB_DEFBUTTON2 + MB_ICONQUESTION,"Q&amp;A問題回報") = IDYES Then
+	If msgbox(&quot;確定登出?&quot;, MB_YESNO + MB_DEFBUTTON2 + MB_ICONQUESTION,&quot;Q&amp;A問題回報&quot;) = IDYES Then
 		save2UserConfig(&quot;&quot;, &quot;&quot;, &quot;&quot;)  &apos; truncate
 		e.Source.Context.endDialog(0)
 	EndIf

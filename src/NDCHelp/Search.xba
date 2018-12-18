@@ -113,12 +113,12 @@ function queryKeyword(doc)
 	if dlg.getControl(&quot;OptionButton1&quot;).State then  &apos; 單一文件查詢
 		&apos; 沒開啟說明文件就查詢
 		if isNull(doc) or isEmpty(doc) then
-			msgbox(&quot;請先開啟說明&quot;, 1,"關鍵字查詢")
+			msgbox(&quot;請先開啟說明&quot;, 1,&quot;關鍵字查詢&quot;)
 			exit function
 		endif
 		searchDoc(doc, presearch_keyword, true)  &apos; 還原前次查詢結果的顏色
 		if searchDoc(doc, keyword, false) = 0 then
-			msgbox(&quot;查無結果&quot;, 1,"關鍵字查詢")
+			msgbox(&quot;查無結果&quot;, 1,&quot;關鍵字查詢&quot;)
 		endif
 	ElseIf dlg.getControl(&quot;OptionButton2&quot;).State Then &apos; 全域查詢
 		searchGlobal(keyword)
@@ -133,13 +133,88 @@ REM **query func button: click
 REM **查詢關鍵字：查詢符合關鍵字的說明列表
 REM *****
 function queryFunc()
+    queryTags()
 	&apos; 沒輸入關鍵字則列全部
-	func_keyword = inputbox(&quot;輸入關鍵字&quot;, &quot;功能查詢&quot;)
+	&apos;func_keyword = inputbox(&quot;輸入關鍵字&quot;, &quot;功能查詢&quot;)
 
-	prerow = nothing
+	&apos;prerow = nothing
 &apos;	on error resume next
-	lboxqh_insertdata(pyGetHelpIndex(func_keyword))
+	&apos;lboxqh_insertdata(pyGetHelpIndex(func_keyword))
 &apos;    on error goto 0
 end function
+
+Function LoadDialog(Libname as String, DialogName as String, Optional oLibContainer)
+Dim oLib as Object
+Dim oLibDialog as Object
+Dim oRuntimeDialog as Object
+    If IsMissing(oLibContainer) Then
+        oLibContainer = DialogLibraries
+    End If
+    oLibContainer.LoadLibrary(LibName)
+    oLib = oLibContainer.GetByName(Libname)
+    oLibDialog = oLib.GetByName(DialogName)
+    oRuntimeDialog = CreateUnoDialog(oLibDialog)
+    LoadDialog() = oRuntimeDialog
+End Function
+
+Sub LinkBtn(btnname, command)
+	Dim oListener &apos;A created listener object
+	Dim oControl &apos;References a control
+	
+	oListener = CreateUnoListener(&quot;ins_&quot;, &quot;com.sun.star.awt.XActionListener&quot;)
+	oControl = oDialogTag.getControl(btnname)
+	ocontrol.ActionCommand = command
+	ocontrol.addActionListener(oListener)
+end Sub
+
+rem 變數的全域定義
+Dim oDialogTag AS Object
+Dim oDialogTag_state as integer
+
+Sub StartDialogTags
+	if oDialogTag_state = 1 then
+		oDialogTag.Endexecute()
+		oDialogTag_state = 0
+	endif
+		BasicLibraries.LoadLibrary(&quot;Tools&quot;)
+	    oDialogTag = LoadDialog(&quot;NDCHelp&quot;, &quot;FindTags&quot;)
+	    oDialogTag_state = 1
+	    LinkBtn(&quot;CommandButton1&quot;, &quot;Writer&quot;)
+	    LinkBtn(&quot;CommandButton2&quot;, &quot;Impress&quot;)
+	    LinkBtn(&quot;CommandButton3&quot;, &quot;ODF&quot;)
+	    LinkBtn(&quot;CommandButton4&quot;, &quot;Calc&quot;)
+	    LinkBtn(&quot;CommandButton5&quot;, &quot;快速鍵&quot;)
+	    LinkBtn(&quot;CommandButton6&quot;, &quot;LibreOffice 5&quot;)
+	    LinkBtn(&quot;CommandButton7&quot;, &quot;一鍵轉ODF&quot;)
+	    LinkBtn(&quot;CommandButton8&quot;, &quot;列印&quot;)
+	    LinkBtn(&quot;CommandButton9&quot;, &quot;應用工具&quot;)
+	    LinkBtn(&quot;CommandButton10&quot;, &quot;表格&quot;)
+	    LinkBtn(&quot;CommandButton11&quot;, &quot;樣式與格式&quot;)
+	    LinkBtn(&quot;CommandButton12&quot;, &quot;符號表工具&quot;)
+	    LinkBtn(&quot;CommandButton13&quot;, &quot;合併列印&quot;)
+	    LinkBtn(&quot;CommandButton14&quot;, &quot;函數&quot;)
+	    oDialogTag.Execute()
+End Sub
+
+Sub Ins_actionPerformed(oActionEvent)
+	func_keyword = oActionEvent.actionCommand
+	prerow = nothing
+	on error resume next
+	lboxqh_insertdata(pyGetHelpIndex(oActionEvent.actionCommand)) 
+    on error goto 0	
+End Sub
+
+Sub Ins_disposing(oActionEvent)
+	oDialogTag.Endexecute()
+End Sub
+
+REM *****
+REM **query Tags button: click
+REM **Tags查詢：查詢Tags
+REM *****
+function queryTags()
+	StartDialogTags
+end function
+
 
 </script:module>

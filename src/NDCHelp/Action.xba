@@ -35,12 +35,16 @@ REM **來源為 restful data
 REM *****
 function updateZipSerialFile(istream, idx, ttype, extra)
 	dim sfa, tstream, ostream, tmp, buff
+	dim sheet,title
 
 	&apos; 讀取 stream：原始的 zip serial file
 	buff = readFileContentFromZipStream(istream, idx)
+	
+	sheet = doclbox_qh.currentController.ActiveSheet 
+	title = sheet.getCellByPosition(1, idx + 1).string
 	&apos; 置換:格式化成 odt
 	If ttype=&quot;qh&quot; Then  &apos; for HELP
-		tmp = pyFormatDoc(buff, idx, func_keyword)
+		tmp = pyFormatDoc(buff, idx, title, func_keyword)
 		picserials = tmp(1)
 		buff = tmp(0)
 	ElseIf ttype=&quot;se&quot; Then  &apos; for QA search

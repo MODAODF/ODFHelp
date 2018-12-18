@@ -6,14 +6,14 @@ Option Explicit
 REM *****
 REM **Bridge: format document to odt
 REM *****
-function pyFormatDoc(templ, idx, keyword)
+function pyFormatDoc(templ, idx, title, keyword)
 	dim obj, arg
 
 	On Local Error GoTo err
 	obj = createunoservice(&quot;ndc.DocTemplImp&quot;)
 
 	if not isNull(obj) then
-		arg = MakeNamedValue(&quot;formatDoc&quot;, array(getmodulepath, templ, idx, keyword))
+		arg = MakeNamedValue(&quot;formatDoc&quot;, array(getmodulepath, templ, idx, title, keyword))
 		pyFormatDoc() = obj.execute(array(arg))
 	EndIf
 	Exit Function
@@ -260,6 +260,18 @@ function pyGetWindowsVer() As String
 	Exit Function
 err:
 	saveError(&quot;取得 Windows 版本資訊發生錯誤&quot;)
+end function
+
+REM *****
+REM **Bridge: Web browser( Default browser )
+REM *****
+function pyUseWebBrowser(webfilename)
+	dim obj
+
+	obj = createunoservice(&quot;ndc.QAImp&quot;)
+	if not isNull(obj) then
+		obj.execute(array(MakeNamedValue(&quot;UseWebBrowser&quot;, webfilename)))
+	endif
 end function
 
 </script:module>

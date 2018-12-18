@@ -138,11 +138,11 @@ Sub validateQALogin(e)
 	partid = trim(dlg.getControl(&quot;partid&quot;).Text)
 	email = trim(dlg.getControl(&quot;email&quot;).Text)
 	If username = &quot;&quot; Or partid = &quot;&quot; Or email = &quot;&quot; Then 
-		msgbox(&quot;所有欄位為必填&quot;, 1,"Q&amp;A問題回報註冊")
+		msgbox(&quot;所有欄位為必填&quot;, 1,&quot;Q&amp;A問題回報註冊&quot;)
 		Exit Sub
 	EndIf
 	If dlg.getControl(&quot;OptionButton1&quot;).Model.State = false Then
-		msgbox(&quot;單位代碼驗證失敗&quot;, 1,"Q&amp;A問題回報註冊")
+		msgbox(&quot;單位代碼驗證失敗&quot;, 1,&quot;Q&amp;A問題回報註冊&quot;)
 		Exit Sub
 	EndIf
 	dlg.endDialog(1)
@@ -180,15 +180,15 @@ Function setUserDataFromDlg()
 	If ubound(user) &gt; 0 Then uid = user(1)
 
 	If user(0) = &quot;email&quot; Then
-		msgbox(&quot;該email已註冊，請使用其他email&quot;, 1,"Q&amp;A問題回報註冊")
+		msgbox(&quot;該email已註冊，請使用其他email&quot;, 1,&quot;Q&amp;A問題回報註冊&quot;)
 		Exit Function
 	EndIf
 	If user(0) = &quot;namedepart&quot; Then
-		msgbox(&quot;該單位使用者已註冊，請使用其他名稱&quot;, 1,"Q&amp;A問題回報註冊") 
+		msgbox(&quot;該單位使用者已註冊，請使用其他名稱&quot;, 1,&quot;Q&amp;A問題回報註冊&quot;) 
 		Exit Function
 	EndIf
 	If user(0) = &quot;all&quot; And uid &gt; 0 Then  &apos; 已有該帳號：顯示警告訊息
-		msgbox(&quot;歡迎回來繼續使用Q&amp;A問題回報程式，您可繼續查詢先前提問的記錄。&quot;,,"Q&amp;A問題回報註冊")
+		msgbox(&quot;歡迎回來繼續使用Q&amp;A問題回報程式，您可繼續查詢先前提問的記錄。&quot;,,&quot;Q&amp;A問題回報註冊&quot;)
 		ret = pylogQAUserMeta(uid)
 		If ret Then
 			save2UserConfig(username, partid, email)
@@ -207,7 +207,7 @@ Function setUserDataFromDlg()
 		EndIf
 	EndIf
 &apos;	Else
-		msgbox(&quot;伺服器連線失敗! 無法更新使用者資訊&quot;, 1,"Q&amp;A問題回報註冊")
+		msgbox(&quot;伺服器連線失敗! 無法更新使用者資訊&quot;, 1,&quot;Q&amp;A問題回報註冊&quot;)
 &apos;	EndIf
 	exit function
 err:
@@ -234,7 +234,7 @@ Function dlg_windowClosing(e)
 	Dim ret
 
 	ret = msgbox(&quot;確定要取消此畫面？確認後原有的帳號仍會保留在本電腦中。&quot;,_
-				  MB_YESNO + MB_DEFBUTTON1 + MB_ICONQUESTION,"Q&amp;A問題回報註冊")
+				  MB_YESNO + MB_DEFBUTTON1 + MB_ICONQUESTION,&quot;Q&amp;A問題回報註冊&quot;)
 	If ret = IDYES then
 		e.Source.endDialog(IDCANCEL)
 	Else

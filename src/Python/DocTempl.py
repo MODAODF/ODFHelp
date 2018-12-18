@@ -128,7 +128,7 @@ def regCheckImg(modpath, buf, idx):
 #  @param idx int index
 #  @param keyword str 關鍵字查詢用
 #  @return list [str of content.xml, list of image urls]
-def formatDoc(modpath, templ, idx, keyword):
+def formatDoc(modpath, templ, idx, title, keyword):
     global imgs, forZip
 
     forZip = modpath is not None
@@ -148,6 +148,7 @@ def formatDoc(modpath, templ, idx, keyword):
     imgs = list()
     content = list()
     data = HelpObj(op).getContent(idx, keyword, modpath)
+    ridx = HelpObj(op).getImgIndex(idx, title, modpath)
     for buf in data.split('\n'):  # 處理每一行
         result = re.match('^(#{1,6})(.*)$', buf)  # 找 # ## ### ####
         chp1 = re.match(r'^\+\s(.*)$', buf)
@@ -162,7 +163,7 @@ def formatDoc(modpath, templ, idx, keyword):
         elif chp2:  # 項目第二層
             buf = chp2_t % (html.escape(chp2.groups()[0]))
         else:  # 解析圖片網址
-            buf = regCheckImg(modpath, buf, idx)
+            buf = regCheckImg(modpath, buf, ridx)
 
         content.append(buf)
 
@@ -210,8 +211,8 @@ if __name__ != '__main__':
         def execute(self, args):
             for prop in args:
                 if prop.Name == 'formatDoc':
-                    modpath, templ, idx, keyword = prop.Value
-                    return formatDoc(modpath, templ, idx, keyword)
+                    modpath, templ, idx, title, keyword = prop.Value
+                    return formatDoc(modpath, templ, idx, title, keyword)
                 if prop.Name == 'formatDocQA':
                     modpath, templ, idx, breadcrumb = prop.Value
                     return formatDocQA(modpath, templ, idx, breadcrumb)

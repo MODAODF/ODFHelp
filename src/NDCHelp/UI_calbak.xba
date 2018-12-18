@@ -81,6 +81,7 @@ function actClose_qh(e)
 	window_qh.dispose()
 	window_st.dispose()
 	window_se.dispose()
+	oDialogTag.endexecute()
 end function
 
 REM *****
