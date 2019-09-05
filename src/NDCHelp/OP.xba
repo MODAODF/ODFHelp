@@ -25,7 +25,8 @@ REM *****
 REM **main op: 顯示小幫手視窗
 REM *****
 function doHelp()
-	startUI(pyGetHelpIndex(&quot;&quot;))
+REM	startUI(pyGetHelpIndex(&quot;&quot;))
+	pyUseWebBrowser(&quot;qa_helper.html&quot;)
 end function
 
 REM *****
@@ -111,7 +112,7 @@ REM	ret = msgbox(msg, 1,&quot;重新註冊Q&amp;A帳號&quot;)
 REM	if ret &lt;&gt; 1 then exit function
 
 REM	setUserDataFromDlg()
-    pyUseWebBrowser(&quot;qa_resignup.html&quot;)
+    pyUseWebBrowser(&quot;qa_signup.html&quot;)
 End Function
 
 REM *****
