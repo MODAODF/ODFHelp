@@ -116,6 +116,13 @@ REM	setUserDataFromDlg()
 End Function
 
 REM *****
+REM **main op: QA範本中心
+REM *****
+function doTemplateQA()
+    pyUseWebBrowser(&quot;odftemplate.html&quot;)
+end function
+
+REM *****
 REM **QA 問題回報: 送出問題
 REM *****
 function onQASubmit(e)

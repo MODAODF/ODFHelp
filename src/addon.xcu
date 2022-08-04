@@ -11,7 +11,7 @@
           <value/>
         </prop>
         <prop oor:name="Title" oor:type="xs:string">
-          <value xml:lang="zh-tw">ODF應用工具</value>
+          <value xml:lang="zh-tw">ODF應用工具(~X)</value>
         </prop>
         <node oor:name="Submenu">
           <node oor:name="menu01" oor:op="replace">
@@ -28,7 +28,7 @@
               <value>_self</value>
             </prop>
             <prop oor:name="ImageIdentifier" oor:type="xs:string">
-              <value/>
+              <value>%origin%/icons/01</value>
             </prop>
           </node>
           <node oor:name="menu02" oor:op="replace">
@@ -45,7 +45,7 @@
               <value>_self</value>
             </prop>
             <prop oor:name="ImageIdentifier" oor:type="xs:string">
-              <value/>
+              <value>%origin%/icons/02</value>
             </prop>
           </node>
           <node oor:name="menu03" oor:op="replace">
@@ -62,10 +62,27 @@
               <value>_self</value>
             </prop>
             <prop oor:name="ImageIdentifier" oor:type="xs:string">
-              <value/>
+              <value>%origin%/icons/03</value>
             </prop>
           </node>
           <node oor:name="menu04" oor:op="replace">
+            <prop oor:name="Context" oor:type="xs:string">
+              <value/>
+            </prop>
+            <prop oor:name="Title" oor:type="xs:string">
+              <value xml:lang="zh-TW">Q&amp;A範本列表(~P)</value>
+            </prop>
+            <prop oor:name="URL" oor:type="xs:string">
+              <value>vnd.sun.star.script:NDCHelp.OP.doTemplateQA?language=Basic&amp;location=application</value>
+            </prop>
+            <prop oor:name="Target" oor:type="xs:string">
+              <value>_self</value>
+            </prop>
+            <prop oor:name="ImageIdentifier" oor:type="xs:string">
+              <value>%origin%/icons/05</value>
+            </prop>
+          </node>
+          <node oor:name="menu05" oor:op="replace">
             <prop oor:name="Context" oor:type="xs:string">
               <value/>
             </prop>
@@ -79,24 +96,7 @@
               <value>_self</value>
             </prop>
             <prop oor:name="ImageIdentifier" oor:type="xs:string">
-              <value/>
-            </prop>
-          </node>
-          <node oor:name="menu05" oor:op="replace">
-            <prop oor:name="Context" oor:type="xs:string">
-              <value/>
-            </prop>
-            <prop oor:name="Title" oor:type="xs:string">
-              <value xml:lang="zh-TW">公務文件範本(~T)</value>
-            </prop>
-            <prop oor:name="URL" oor:type="xs:string">
-              <value>vnd.sun.star.script:NDCHelp.OP.doNDCCollection?language=Basic&amp;location=application</value>
-            </prop>
-            <prop oor:name="Target" oor:type="xs:string">
-              <value>_self</value>
-            </prop>
-            <prop oor:name="ImageIdentifier" oor:type="xs:string">
-              <value/>
+              <value>%origin%/icons/04</value>
             </prop>
           </node>
           <node oor:name="menu06" oor:op="replace">
@@ -113,10 +113,59 @@
               <value>_self</value>
             </prop>
             <prop oor:name="ImageIdentifier" oor:type="xs:string">
-              <value/>
+              <value>%origin%/icons/06</value>
             </prop>
           </node>
-
+          <node oor:name="menu07" oor:op="replace">
+            <prop oor:name="Context" oor:type="xs:string">
+              <value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument</value>
+            </prop>
+            <prop oor:name="URL" oor:type="xs:string">
+              <value>private:separator</value>
+            </prop>
+          </node>
+          <node oor:name="menu08" oor:op="replace">
+            <prop oor:name="Context" oor:type="xs:string">
+              <value/>
+            </prop>
+            <prop oor:name="Title" oor:type="xs:string">
+              <value xml:lang="zh-TW">公務文件範本(~T)</value>
+            </prop>
+            <prop oor:name="URL" oor:type="xs:string">
+              <value>vnd.sun.star.script:NDCHelp.OP.doNDCCollection?language=Basic&amp;location=application</value>
+            </prop>
+            <prop oor:name="Target" oor:type="xs:string">
+              <value>_self</value>
+            </prop>
+            <prop oor:name="ImageIdentifier" oor:type="xs:string">
+              <value>%origin%/icons/05</value>
+            </prop>
+          </node>
+          <node oor:name="menu09" oor:op="replace">
+            <prop oor:name="Context" oor:type="xs:string">
+              <value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument</value>
+            </prop>
+            <prop oor:name="URL" oor:type="xs:string">
+              <value>private:separator</value>
+            </prop>
+          </node>
+          <node oor:name="menu10" oor:op="replace">
+            <prop oor:name="Context" oor:type="xs:string">
+              <value/>
+            </prop>
+            <prop oor:name="Title" oor:type="xs:string">
+              <value xml:lang="zh-TW">機關範本中心</value>
+            </prop>
+            <prop oor:name="URL" oor:type="xs:string">
+              <value>vnd.sun.star.script:NDCHelp.Bridge.pyTemplateRepo?language=Basic&amp;location=application</value>
+            </prop>
+            <prop oor:name="Target" oor:type="xs:string">
+              <value>_self</value>
+            </prop>
+            <prop oor:name="ImageIdentifier" oor:type="xs:string">
+              <value>%origin%/icons/07</value>
+            </prop>
+          </node>
         </node>
 
 

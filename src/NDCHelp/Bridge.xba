@@ -274,4 +274,21 @@ function pyUseWebBrowser(webfilename)
 	endif
 end function
 
+REM *****
+REM **Bridge: get Windows version info string
+REM *****
+function pyTemplateRepo()
+	dim obj, arg
+
+	On Local Error GoTo err
+	obj = createunoservice(&quot;TemplateRepo.Main&quot;)
+	if not isNull(obj) then
+		obj.execute(array())
+	else
+		Msgbox(&quot;您好！系統偵測到目前未安裝［機關範本中心］套件。&quot;+chr(10)+&quot;請自行至國發會網站下載套件並安裝使用，謝謝您。&quot;)
+	EndIf
+	Exit Function
+err:
+	saveError(&quot;pyTemplateRepo Error&quot;)
+end function
 </script:module>
