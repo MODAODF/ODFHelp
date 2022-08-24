@@ -285,7 +285,7 @@ function pyTemplateRepo()
 	if not isNull(obj) then
 		obj.execute(array())
 	else
-		Msgbox(&quot;您好！系統偵測到目前未安裝［機關範本中心］套件。&quot;+chr(10)+&quot;請自行至國發會網站下載套件並安裝使用，謝謝您。&quot;)
+		Msgbox(&quot;您好！系統偵測到目前未安裝［機關範本中心］套件。&quot;+chr(10)+&quot;請自行至MODA網站下載套件並安裝使用，謝謝您。&quot;)
 	EndIf
 	Exit Function
 err:
