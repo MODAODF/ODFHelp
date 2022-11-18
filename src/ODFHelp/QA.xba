@@ -158,7 +158,7 @@ REM *****
 Function setUserDataFromDlg()
 	Dim ret, dlg, username, partid, email, uid, user, calbak
 
-	dlg = createunodialog(DialogLibraries.NDCHelp.QALogin)
+	dlg = createunodialog(DialogLibraries.ODFHelp.QALogin)
 	calbak = CreateUnoListener(&quot;dlg_&quot;, XTopWindowListener)
 	dlg.peer.addTopWindowListener(calbak)
 

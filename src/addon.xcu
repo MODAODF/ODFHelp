@@ -6,7 +6,7 @@
     oor:package="org.openoffice.Office">
   <node oor:name="AddonUI">
     <node oor:name="OfficeMenuBar">
-      <node oor:name="org.openoffice.Office.addon.NDCHelper" oor:op="replace">
+      <node oor:name="org.openoffice.Office.addon.ODFHelper" oor:op="replace">
         <prop oor:name="Context" oor:type="xs:string">
           <value/>
         </prop>
@@ -22,7 +22,7 @@
               <value xml:lang="zh-TW">操作小幫手(~H)</value>
             </prop>
             <prop oor:name="URL" oor:type="xs:string">
-              <value>vnd.sun.star.script:NDCHelp.OP.doHelp?language=Basic&amp;location=application</value>
+              <value>vnd.sun.star.script:ODFHelp.OP.doHelp?language=Basic&amp;location=application</value>
             </prop>
             <prop oor:name="Target" oor:type="xs:string">
               <value>_self</value>
@@ -39,7 +39,7 @@
               <value xml:lang="zh-TW">Q&amp;A問題回報(~Q)</value>
             </prop>
             <prop oor:name="URL" oor:type="xs:string">
-              <value>vnd.sun.star.script:NDCHelp.OP.doQA?language=Basic&amp;location=application</value>
+              <value>vnd.sun.star.script:ODFHelp.OP.doQA?language=Basic&amp;location=application</value>
             </prop>
             <prop oor:name="Target" oor:type="xs:string">
               <value>_self</value>
@@ -56,7 +56,7 @@
               <value xml:lang="zh-TW">Q&amp;A問題回應列表(~L)</value>
             </prop>
             <prop oor:name="URL" oor:type="xs:string">
-              <value>vnd.sun.star.script:NDCHelp.OP.doStatusList?language=Basic&amp;location=application</value>
+              <value>vnd.sun.star.script:ODFHelp.OP.doStatusList?language=Basic&amp;location=application</value>
             </prop>
             <prop oor:name="Target" oor:type="xs:string">
               <value>_self</value>
@@ -73,7 +73,7 @@
               <value xml:lang="zh-TW">Q&amp;A範本列表(~P)</value>
             </prop>
             <prop oor:name="URL" oor:type="xs:string">
-              <value>vnd.sun.star.script:NDCHelp.OP.doTemplateQA?language=Basic&amp;location=application</value>
+              <value>vnd.sun.star.script:ODFHelp.OP.doTemplateQA?language=Basic&amp;location=application</value>
             </prop>
             <prop oor:name="Target" oor:type="xs:string">
               <value>_self</value>
@@ -90,7 +90,7 @@
               <value xml:lang="zh-TW">Q&amp;A搜尋(~S)</value>
             </prop>
             <prop oor:name="URL" oor:type="xs:string">
-              <value>vnd.sun.star.script:NDCHelp.OP.doSearchQA?language=Basic&amp;location=application</value>
+              <value>vnd.sun.star.script:ODFHelp.OP.doSearchQA?language=Basic&amp;location=application</value>
             </prop>
             <prop oor:name="Target" oor:type="xs:string">
               <value>_self</value>
@@ -107,7 +107,7 @@
               <value xml:lang="zh-TW">重新註冊Q&amp;A帳號(~R)</value>
             </prop>
             <prop oor:name="URL" oor:type="xs:string">
-              <value>vnd.sun.star.script:NDCHelp.OP.doRelogin?language=Basic&amp;location=application</value>
+              <value>vnd.sun.star.script:ODFHelp.OP.doRelogin?language=Basic&amp;location=application</value>
             </prop>
             <prop oor:name="Target" oor:type="xs:string">
               <value>_self</value>
@@ -132,7 +132,7 @@
               <value xml:lang="zh-TW">公務文件範本(~T)</value>
             </prop>
             <prop oor:name="URL" oor:type="xs:string">
-              <value>vnd.sun.star.script:NDCHelp.OP.doNDCCollection?language=Basic&amp;location=application</value>
+              <value>vnd.sun.star.script:ODFHelp.OP.doODFCollection?language=Basic&amp;location=application</value>
             </prop>
             <prop oor:name="Target" oor:type="xs:string">
               <value>_self</value>
@@ -157,7 +157,7 @@
               <value xml:lang="zh-TW">機關範本中心</value>
             </prop>
             <prop oor:name="URL" oor:type="xs:string">
-              <value>vnd.sun.star.script:NDCHelp.Bridge.pyTemplateRepo?language=Basic&amp;location=application</value>
+              <value>vnd.sun.star.script:ODFHelp.Bridge.pyTemplateRepo?language=Basic&amp;location=application</value>
             </prop>
             <prop oor:name="Target" oor:type="xs:string">
               <value>_self</value>
@@ -172,7 +172,7 @@
       </node>
     </node>
     <node oor:name="Images">
-      <node oor:name="org.openoffice.Office.addon.NDCHelper.dummy" oor:op="replace">
+      <node oor:name="org.openoffice.Office.addon.ODFHelper.dummy" oor:op="replace">
         <prop oor:name="URL" oor:type="xs:string">
           <value>%origin%</value>
         </prop>

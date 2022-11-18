@@ -149,5 +149,5 @@ class UtilsImp(unohelper.Base, XJob):
 
 g_ImplementationHelper = unohelper.ImplementationHelper()
 g_ImplementationHelper.addImplementation(UtilsImp,
-                                         "ndc.UtilsImp",
+                                         "moda.UtilsImp",
                                          ("com.sun.star.task.Job",),)

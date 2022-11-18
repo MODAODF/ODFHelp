@@ -1,5 +1,5 @@
 ZIP=`which zip`
-Productname=NDCHelp
+Productname=ODFHelp
 
 all:
 	./addver.sh; \

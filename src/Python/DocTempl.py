@@ -219,5 +219,5 @@ if __name__ != '__main__':
 
     g_ImplementationHelper = unohelper.ImplementationHelper()
     g_ImplementationHelper.addImplementation(DocTemplImp,
-                                             "ndc.DocTemplImp",
+                                             "moda.DocTemplImp",
                                              ("com.sun.star.task.Job",),)

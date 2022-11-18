@@ -4,29 +4,29 @@
  <dlg:bulletinboard>
   <dlg:text dlg:id="Label1" dlg:tab-index="7" dlg:left="9" dlg:top="118" dlg:width="28" dlg:height="12" dlg:value="問題描述"/>
   <dlg:button dlg:id="CommandButton1" dlg:tab-index="5" dlg:left="124" dlg:top="231" dlg:width="67" dlg:height="18" dlg:tabstop="true" dlg:default="true" dlg:value="送出">
-   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:NDCHelp.OP.onQASubmit?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:ODFHelp.OP.onQASubmit?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:button>
   <dlg:text dlg:id="Label2" dlg:tab-index="8" dlg:left="9" dlg:top="100" dlg:width="28" dlg:height="12" dlg:value="問題 Title"/>
   <dlg:text dlg:id="Label3" dlg:tab-index="9" dlg:left="9" dlg:top="78" dlg:width="28" dlg:height="12" dlg:value="問題分類" dlg:tabstop="false"/>
   <dlg:combobox dlg:id="ComboBox1" dlg:tab-index="0" dlg:left="57" dlg:top="79" dlg:width="64" dlg:height="12" dlg:spin="true">
-   <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:NDCHelp.OP.onSelQACateList?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:ODFHelp.OP.onSelQACateList?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:combobox>
   <dlg:combobox dlg:id="ComboBox2" dlg:tab-index="1" dlg:left="123" dlg:top="79" dlg:width="63" dlg:height="12" dlg:spin="true">
-   <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:NDCHelp.OP.onSelQAForumList?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:ODFHelp.OP.onSelQAForumList?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:combobox>
   <dlg:text dlg:id="Label4" dlg:tab-index="10" dlg:left="9" dlg:top="58" dlg:width="40" dlg:height="12" dlg:value="使用者 email"/>
   <dlg:text dlg:id="Label5" dlg:tab-index="12" dlg:left="9" dlg:top="39" dlg:width="42" dlg:height="12" dlg:value="機關代碼或全銜"/>
   <dlg:text dlg:id="Label6" dlg:tab-index="14" dlg:left="9" dlg:top="18" dlg:width="40" dlg:height="12" dlg:value="使用者名稱"/>
   <dlg:textfield dlg:id="username" dlg:tab-index="6" dlg:disabled="true" dlg:left="57" dlg:top="15" dlg:width="128" dlg:height="14" dlg:readonly="true" dlg:value="QA模擬使用者"/>
   <dlg:textfield dlg:id="partid" dlg:tab-index="13" dlg:disabled="true" dlg:left="57" dlg:top="37" dlg:width="128" dlg:height="14" dlg:readonly="true" dlg:value="QA模擬單位"/>
-  <dlg:textfield dlg:id="email" dlg:tab-index="11" dlg:disabled="true" dlg:left="57" dlg:top="58" dlg:width="129" dlg:height="14" dlg:readonly="true" dlg:value="ndcodfservice@ossii.com.tw"/>
+  <dlg:textfield dlg:id="email" dlg:tab-index="11" dlg:disabled="true" dlg:left="57" dlg:top="58" dlg:width="129" dlg:height="14" dlg:readonly="true" dlg:value="modaodfservice@ossii.com.tw"/>
   <dlg:textfield dlg:id="title" dlg:tab-index="2" dlg:left="57" dlg:top="100" dlg:width="129" dlg:height="14"/>
   <dlg:textfield dlg:id="desc" dlg:tab-index="3" dlg:left="9" dlg:top="129" dlg:width="180" dlg:height="67" dlg:valign="top" dlg:multiline="true"/>
   <dlg:textfield dlg:id="newuser" dlg:tab-index="15" dlg:left="236" dlg:top="35" dlg:width="79" dlg:height="22"/>
   <dlg:filecontrol dlg:id="FileControl1" dlg:tab-index="4" dlg:left="53" dlg:top="201" dlg:width="136" dlg:height="18"/>
   <dlg:text dlg:id="Label7" dlg:tab-index="16" dlg:left="10" dlg:top="209" dlg:width="28" dlg:height="12" dlg:value="附檔"/>
   <dlg:button dlg:id="CommandButton2" dlg:tab-index="17" dlg:left="10" dlg:top="230" dlg:width="67" dlg:height="18" dlg:tabstop="true" dlg:default="true" dlg:value="登出">
-   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:NDCHelp.OP.onQALogout?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:ODFHelp.OP.onQALogout?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:button>
  </dlg:bulletinboard>
 </dlg:window>

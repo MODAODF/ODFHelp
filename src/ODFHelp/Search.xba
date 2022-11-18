@@ -104,7 +104,7 @@ function queryKeyword(doc)
 	dim keyword, dlg
 	findCurIdx = -1
 
-	dlg = createunodialog(DialogLibraries.NDCHelp.Find)
+	dlg = createunodialog(DialogLibraries.ODFHelp.Find)
 	if dlg.execute() = 0 then exit function
 
 	keyword = dlg.getControl(&quot;TextField1&quot;).text
@@ -177,7 +177,7 @@ Sub StartDialogTags
 		oDialogTag_state = 0
 	endif
 		BasicLibraries.LoadLibrary(&quot;Tools&quot;)
-	    oDialogTag = LoadDialog(&quot;NDCHelp&quot;, &quot;FindTags&quot;)
+	    oDialogTag = LoadDialog(&quot;ODFHelp&quot;, &quot;FindTags&quot;)
 	    oDialogTag_state = 1
 	    LinkBtn(&quot;CommandButton1&quot;, &quot;Writer&quot;)
 	    LinkBtn(&quot;CommandButton2&quot;, &quot;Impress&quot;)

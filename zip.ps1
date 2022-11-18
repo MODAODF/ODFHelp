@@ -1,5 +1,5 @@
 # project name
-$filename = "NDCHelp"
+$filename = "ODFHelp"
 
 # compression delay time
 $zipdelay = 15000

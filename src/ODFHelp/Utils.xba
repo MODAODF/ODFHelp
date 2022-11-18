@@ -20,7 +20,7 @@ REM **init: 前置函式
 REM *****
 function init()
 	loadModules()
-	dialogLibraries.loadLibrary(&quot;NDCHelp&quot;)
+	dialogLibraries.loadLibrary(&quot;ODFHelp&quot;)
 	helpContOpened = true
 end function
 
@@ -69,7 +69,7 @@ Function getModulePath()
 
 	&apos;retrieve the URL from the registry
 	oKey = getRegistryKeyContent(&quot;org.openoffice.Office.Addons/AddonUI/Images/&quot;)
-	oImage = oKey.getByName(&quot;org.openoffice.Office.addon.NDCHelper.dummy&quot;)
+	oImage = oKey.getByName(&quot;org.openoffice.Office.addon.ODFHelper.dummy&quot;)
 	sURL = oImage.URL
 	sURL = Join(Split(sURL, &quot;vnd.sun.star.expand:&quot;))
 	oMS = getProcessServiceManager().DefaultContext.getValueByName(&quot;/singletons/com.sun.star.util.theMacroExpander&quot;)
@@ -203,7 +203,7 @@ REM **若安裝重複模組，則　bundled &gt; shared &gt; user
 REM *****
 Function getMyNameVersion()
 	Dim idx, which, package, exts, ext, version
-	Const extname = &quot;NDCHelp&quot;
+	Const extname = &quot;ODFHelp&quot;
 	Const ExtMgr = &quot;/singletons/com.sun.star.deployment.ExtensionManager&quot;
 
 	version = &quot;?.?.?&quot;

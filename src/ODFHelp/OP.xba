@@ -8,12 +8,12 @@ public selForumIdx
 REM *****
 REM **main op: 顯示延伸套件(公務文件範本)
 REM *****
-function doNDCCollection()
-	on error goto ndcnotfound
+function doODFCollection()
+	on error goto odfnotfound
 	BasicLibraries.loadLibrary(&quot;Basicc&quot;)
 	Basicc.Module2.Main
 	exit function
-ndcnotfound:
+odfnotfound:
 REM **msgbox &quot;請先安裝延伸套件(公務文件範本)!&quot;
 	dim document   as object
 	dim dispatcher as object
@@ -56,7 +56,7 @@ REM	init()
 REM	if not tryQALoginNewUser() Then Exit Function
 
 REM	selCateIdx = -1: selForumIdx = -1
-REM	dlg = createunodialog(DialogLibraries.NDCHelp.QA)
+REM	dlg = createunodialog(DialogLibraries.ODFHelp.QA)
 
 REM	dlg.getControl(&quot;username&quot;).Text = QAUserData(&quot;username&quot;)
 REM	dlg.getControl(&quot;partid&quot;).Text = QAUserData(&quot;partid&quot;)

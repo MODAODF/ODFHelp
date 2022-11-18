@@ -11,22 +11,22 @@
   <dlg:text dlg:id="Label3" dlg:tab-index="6" dlg:left="9" dlg:top="49" dlg:width="49" dlg:height="12" dlg:value="使用者名稱(自訂)"/>
   <dlg:textfield dlg:id="username" dlg:tab-index="0" dlg:left="66" dlg:top="45" dlg:width="207" dlg:height="14"/>
   <dlg:textfield dlg:id="partid" dlg:tab-index="1" dlg:left="66" dlg:top="67" dlg:width="57" dlg:height="14">
-   <script:event script:event-name="on-textchange" script:macro-name="vnd.sun.star.script:NDCHelp.QA.partid_updated?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-textchange" script:macro-name="vnd.sun.star.script:ODFHelp.QA.partid_updated?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:textfield>
   <dlg:textfield dlg:id="email" dlg:tab-index="3" dlg:left="66" dlg:top="88" dlg:width="207" dlg:height="14"/>
   <dlg:button dlg:id="CommandButton2" dlg:tab-index="2" dlg:disabled="true" dlg:left="126" dlg:top="65" dlg:width="44" dlg:height="18" dlg:value="驗證查詢&gt;&gt;">
-   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:NDCHelp.QA.getPartNameById?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:ODFHelp.QA.getPartNameById?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:button>
   <dlg:text dlg:id="Label4" dlg:tab-index="7" dlg:left="173" dlg:top="70" dlg:width="98" dlg:height="12" dlg:value="查詢結果"/>
   <dlg:radiogroup>
    <dlg:radio dlg:id="OptionButton1" dlg:tab-index="8" dlg:left="-15" dlg:top="-47" dlg:width="67" dlg:height="22" dlg:value="OptionButton1"/>
   </dlg:radiogroup>
-  <dlg:text dlg:style-id="0" dlg:id="Label5" dlg:tab-index="9" dlg:left="9" dlg:top="3" dlg:width="262" dlg:height="20" dlg:value="歡迎使用MODA ODF應用工具Q&amp;A問題小幫手，本程式需透過網路連線提供服務，若無法連線至網際網路，請聯繫貴單位網路管理人員協助處理，謝謝您。" dlg:multiline="true"/>
+  <dlg:text dlg:style-id="0" dlg:id="Label5" dlg:tab-index="9" dlg:left="9" dlg:top="3" dlg:width="262" dlg:height="20" dlg:value="歡迎使用 ODF 應用工具Q&amp;A問題小幫手，本程式需透過網路連線提供服務，若無法連線至網際網路，請聯繫貴單位網路管理人員協助處理，謝謝您。" dlg:multiline="true"/>
   <dlg:text dlg:style-id="1" dlg:id="Label6" dlg:tab-index="10" dlg:left="7" dlg:top="31" dlg:width="69" dlg:height="11" dlg:value="&#x0a;以下欄位資訊皆為必填。"/>
   <dlg:text dlg:style-id="1" dlg:id="Label7" dlg:tab-index="11" dlg:left="9" dlg:top="108" dlg:width="207" dlg:height="10" dlg:value="請填入有效的email位址，才可收到關於Q&amp;A處理情況的郵件通知。&#x0a;"/>
-  <dlg:text dlg:style-id="1" dlg:id="Label8" dlg:tab-index="12" dlg:left="9" dlg:top="118" dlg:width="207" dlg:height="10" dlg:value="如果您無法順利註冊，請洽ODF諮詢窗口：聯絡email：odf@ndc.gov.tw。&#x0a;"/>
+  <dlg:text dlg:style-id="1" dlg:id="Label8" dlg:tab-index="12" dlg:left="9" dlg:top="118" dlg:width="207" dlg:height="10" dlg:value="如果您無法順利註冊，請洽ODF諮詢窗口：聯絡email：odf@moda.gov.tw。&#x0a;"/>
   <dlg:button dlg:id="CommandButton1" dlg:tab-index="12" dlg:left="202" dlg:top="134" dlg:width="69" dlg:height="14" dlg:value="送出">
-   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:NDCHelp.QA.validateQALogin?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:ODFHelp.QA.validateQALogin?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:button>
  </dlg:bulletinboard>
 </dlg:window>

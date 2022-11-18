@@ -10,7 +10,7 @@ function pyFormatDoc(templ, idx, title, keyword)
 	dim obj, arg
 
 	On Local Error GoTo err
-	obj = createunoservice(&quot;ndc.DocTemplImp&quot;)
+	obj = createunoservice(&quot;moda.DocTemplImp&quot;)
 
 	if not isNull(obj) then
 		arg = MakeNamedValue(&quot;formatDoc&quot;, array(getmodulepath, templ, idx, title, keyword))
@@ -27,7 +27,7 @@ REM *****
 function pyFormatDocQA(templ, idx, breadcrumb)
 	dim obj, arg
 	On Local Error GoTo err
-	obj = createunoservice(&quot;ndc.DocTemplImp&quot;)
+	obj = createunoservice(&quot;moda.DocTemplImp&quot;)
 
 	if not isNull(obj) then
 		arg = MakeNamedValue(&quot;formatDocQA&quot;, _
@@ -46,7 +46,7 @@ function pyGetHelpIndex(keyword)
 	dim obj, arg
 
 	on local error goto err
-	obj = createunoservice(&quot;ndc.QAImp&quot;)
+	obj = createunoservice(&quot;moda.QAImp&quot;)
 
 	if not isNull(obj) then
 		arg = MakeNamedValue(&quot;helpIndex&quot;, array(getModulePath, keyword))
@@ -65,7 +65,7 @@ function pyGetQACateList()
 	dim obj, arg
 
 	On Local Error GoTo err
-	obj = createunoservice(&quot;ndc.QAImp&quot;)
+	obj = createunoservice(&quot;moda.QAImp&quot;)
 
 	if not isNull(obj) then
 		arg = MakeNamedValue(&quot;getQACateList&quot;, array())
@@ -83,7 +83,7 @@ function pyGetQAForumList(cateid, getid)
 	dim obj, arg
 
 	On Local Error GoTo err
-	obj = createunoservice(&quot;ndc.QAImp&quot;)
+	obj = createunoservice(&quot;moda.QAImp&quot;)
 
 	if not isNull(obj) then
 		arg = MakeNamedValue(&quot;getQAForumList&quot;, array(cateid, getid))
@@ -102,7 +102,7 @@ function pySubmitForum(cateid, forumid, uname, email,_
 	dim obj, arg
 
 	on local error goto err
-	obj = createunoservice(&quot;ndc.QAImp&quot;)
+	obj = createunoservice(&quot;moda.QAImp&quot;)
 
 	if not isNull(obj) then
 		arg = MakeNamedValue(&quot;submitForum&quot;,_
@@ -122,7 +122,7 @@ function pyGetQATopicStatusList(uname, depart, email)
 	dim obj, arg
 
 	On Local Error GoTo err
-	obj = createunoservice(&quot;ndc.QAImp&quot;)
+	obj = createunoservice(&quot;moda.QAImp&quot;)
 	if not isNull(obj) then
 		arg = MakeNamedValue(&quot;getQATopicStatusList&quot;, array(uname, depart, email))
 		pyGetQATopicStatusList() = obj.execute(array(arg))
@@ -139,7 +139,7 @@ function pyGetQASearchList(keyword)
 	dim obj, arg
 
 	On Local Error GoTo err
-	obj = createunoservice(&quot;ndc.QAImp&quot;)
+	obj = createunoservice(&quot;moda.QAImp&quot;)
 	if not isNull(obj) then
 		arg = MakeNamedValue(&quot;getSearchList&quot;, array(keyword))
 		pyGetQASearchList() = obj.execute(array(arg))
@@ -156,7 +156,7 @@ function pyAddNewUser(username, partid, email)
 	dim obj, arg
 
 	On Local Error GoTo err
-	obj = createunoservice(&quot;ndc.QAImp&quot;)
+	obj = createunoservice(&quot;moda.QAImp&quot;)
 	if not isNull(obj) then
 		arg = MakeNamedValue(&quot;addNewUser&quot;, array(username, partid, email))
 		pyAddNewUser() = obj.execute(array(arg))
@@ -173,7 +173,7 @@ function pyUserExist(username, partid, email)
 	dim obj, arg
 
 	On Local Error GoTo err
-	obj = createunoservice(&quot;ndc.QAImp&quot;)
+	obj = createunoservice(&quot;moda.QAImp&quot;)
 	if not isNull(obj) then
 		arg = MakeNamedValue(&quot;userExist&quot;, array(username, partid, email))
 		pyUserExist() = obj.execute(array(arg))
@@ -190,7 +190,7 @@ function pyLogQAUserMeta(uid)
 	dim obj, arg
 
 	On Local Error GoTo err
-	obj = createunoservice(&quot;ndc.QAImp&quot;)
+	obj = createunoservice(&quot;moda.QAImp&quot;)
 	if not isNull(obj) then
 		arg = MakeNamedValue(&quot;logUserMeta&quot;, uid)
 		pyLogQAUserMeta() = obj.execute(array(arg))
@@ -206,7 +206,7 @@ REM *****
 function pyHideAllUI(doc, frame)
 	dim obj
 
-	obj = createunoservice(&quot;ndc.UtilsImp&quot;)
+	obj = createunoservice(&quot;moda.UtilsImp&quot;)
 	if not isNull(obj) then
 		obj.execute(array(MakeNamedValue(&quot;hideAllUI&quot;, frame)))
 	endif
@@ -219,7 +219,7 @@ function pyCreateNewDoc(optional loc, optional hidden)
 	dim argLoc, argHidden, arg
 	dim ret, obj
 
-	obj = createunoservice(&quot;ndc.UtilsImp&quot;)
+	obj = createunoservice(&quot;moda.UtilsImp&quot;)
 	argLoc = loc
 	argHidden = hidden
 	if isMissing(loc) then argLoc = &quot;private:factory/swriter&quot;
@@ -237,7 +237,7 @@ REM *****
 function pyCreateNewPicObj(picFileUrl, doc, cur, w, h)
 	dim obj, arg
 
-	obj = createunoservice(&quot;ndc.UtilsImp&quot;)
+	obj = createunoservice(&quot;moda.UtilsImp&quot;)
 	if not isNull(obj) then
 		arg = MakeNamedValue(&quot;createNewPicObj&quot;,_
 							  array(picFileUrl, doc, cur, doc.text, w, h))
@@ -252,7 +252,7 @@ function pyGetWindowsVer() As String
 	dim obj, arg
 
 	On Local Error GoTo err
-	obj = createunoservice(&quot;ndc.UtilsImp&quot;)
+	obj = createunoservice(&quot;moda.UtilsImp&quot;)
 	if not isNull(obj) then
 		arg = MakeNamedValue(&quot;getWindowsVer&quot;, array())
 		pyGetWindowsVer() = obj.execute(array(arg))
@@ -268,7 +268,7 @@ REM *****
 function pyUseWebBrowser(webfilename)
 	dim obj
 
-	obj = createunoservice(&quot;ndc.QAImp&quot;)
+	obj = createunoservice(&quot;moda.QAImp&quot;)
 	if not isNull(obj) then
 		obj.execute(array(MakeNamedValue(&quot;UseWebBrowser&quot;, webfilename)))
 	endif

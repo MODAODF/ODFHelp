@@ -3,16 +3,16 @@
  xmlns="http://openoffice.org/extensions/description/2006"
  xmlns:dep="http://openoffice.org/extensions/description/2006"
  xmlns:xlink="http://www.w3.org/1999/xlink">
-	<identifier value="tw.ndc.ndchelper"/>
-	<version value="1.2.3"/>
+	<identifier value="tw.odf.odfhelper"/>
+	<version value="1.2.4"/>
 	<registration>
 	</registration>
 	<icon>
-		<default xlink:href="icons/NDC_help_icon.png"/>
+		<default xlink:href="icons/ODF_help_icon.png"/>
 	</icon>
 	<display-name>
-	    <name lang="en">MODAHelp</name>
-	    <name lang="zh-TW">MODA 小幫手</name>
+	    <name lang="en">ODFHelp</name>
+	    <name lang="zh-TW">ODF 小幫手</name>
 	</display-name>
 	<extension-description>
         <src lang="zh-tw" xlink:href="Descriptions/desc.zh-tw"/>
