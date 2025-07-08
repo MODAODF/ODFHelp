@@ -26,7 +26,7 @@ REM **main op: 顯示小幫手視窗
 REM *****
 function doHelp()
 REM	startUI(pyGetHelpIndex(&quot;&quot;))
-	pyUseWebBrowser(&quot;qa_helper.html&quot;)
+	pyUseWebBrowser(&quot;document&quot;)
 end function
 
 REM *****
@@ -41,7 +41,7 @@ REM	datas = pyGetQATopicStatusList(QAUserData(&quot;username&quot;),_
 REM								   QAUserData(&quot;partid&quot;),_
 REM								   QAUserData(&quot;email&quot;))
 REM	startUI_se(datas, &quot;stlst&quot;)
-    pyUseWebBrowser(&quot;qa_list.html&quot;)
+    pyUseWebBrowser(&quot;history&quot;)
 end function
 
 REM *****
@@ -67,7 +67,7 @@ REM   dlg.getControl(&quot;ComboBox1&quot;).model.stringItemList = pyGetQACateLi
 REM	on error goto 0
 
 REM	dlg.execute()
-    pyUseWebBrowser(&quot;qa_signup.html&quot;)
+    pyUseWebBrowser(&quot;reportform&quot;)
 end function
 
 REM *****
@@ -95,7 +95,7 @@ REM	EndIf
 REM	actClose_qh(nothing)  &apos; 從其他功能進來：關閉自己的視窗
 REM	startUI_se(searchdatas, &quot;se&quot;)  &apos; 才開啟搜尋結果視窗
 REM err:
-    pyUseWebBrowser(&quot;qa_index.html&quot;)
+    pyUseWebBrowser(&quot;&quot;)
 end function
 
 REM *****
@@ -112,14 +112,14 @@ REM	ret = msgbox(msg, 1,&quot;重新註冊Q&amp;A帳號&quot;)
 REM	if ret &lt;&gt; 1 then exit function
 
 REM	setUserDataFromDlg()
-    pyUseWebBrowser(&quot;qa_signup.html&quot;)
+    pyUseWebBrowser(&quot;login&quot;)
 End Function
 
 REM *****
 REM **main op: QA範本中心
 REM *****
 function doTemplateQA()
-    pyUseWebBrowser(&quot;odftemplate.html&quot;)
+    pyUseWebBrowser(&quot;odftemplate&quot;)
 end function
 
 REM *****

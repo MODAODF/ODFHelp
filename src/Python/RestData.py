@@ -17,8 +17,8 @@ HELP_HOST = '223.200.166.56'  # rest host
 QA_HOST = '223.200.166.57'  # rest host
 
 USETAGS = 1
-aQA_HOST = 'odf.nat.gov.tw'  # rest host test
-aQA_PATH = '/QA/web/' #rest path
+aQA_HOST = 'odf.moda.gov.tw'  # rest host test
+aQA_PATH = '/QA/public/' #rest path
 
 ## Switch to http connection(REST) or zipfile
 #
